@@ -1,7 +1,6 @@
 import argparse
 import glob
 import os 
-import tqdm
 import pandas as pd
 
 
