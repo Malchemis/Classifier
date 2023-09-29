@@ -59,6 +59,7 @@ if __name__ == "__main__":
     # Open the config file 
     with open(args.config, 'r') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
+    print(f'Loaded config from {args.config}')
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'Using {device}')
@@ -66,6 +67,7 @@ if __name__ == "__main__":
     if os.path.exists(config['data']['partitions.pkl']):
         with open(config['data']['partitions.pkl'], 'rb') as f:
             partition = pickle.load(f)
+        print(f'Loaded partitions from {config["data"]["partitions.pkl"]}')
     else:
         raise ValueError(f'No partitions found at {config["data"]["partitions.pkl"]}')
 
