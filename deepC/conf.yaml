@@ -1,7 +1,7 @@
 data: 
-  data_dir: '/media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec/'
-  annotations_path: '/media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec/weak_labels.csv'
-  partition: '/media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec/partition.pkl'
+  data_dir: '..//SED-single_vehicle-30_sec/'
+  annotations_path: '../SED-single_vehicle-30_sec/weak_labels.csv'
+  partition: '../SED-single_vehicle-30_sec/partition.pkl'
   classes: [1, 2, 5, 12, 15]
   header: ['filepath_wav_30', 'vehicle_class', 'vehicle_class_combo', 'vehicle_class_base',	'speed']
 
