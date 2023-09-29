@@ -63,7 +63,8 @@ if __name__ == "__main__":
     train_dataloader = DataLoader(VehicleDataset(config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
     val_dataloader = DataLoader(VehicleDataset(config, set='val'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
     test_dataloader = DataLoader(VehicleDataset(config, set='test'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
-
+    print(f'Train set size: {len(train_dataloader)}')
+    
     model = vgg16(len(config['data']['classes'])).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=config['training']['lr'])
     writer = SummaryWriter()
