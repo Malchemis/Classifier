@@ -4,9 +4,7 @@ data:
   partition: '../SED-single_vehicle-30_sec/partition.pkl'
   classes: [1, 2, 5, 12, 15]
   header: ['filepath_wav_30', 'vehicle_class', 'vehicle_class_combo', 'vehicle_class_base',	'speed']
-
-# Parameters for the spectrogram computation.
-feats : 
+feats : # Parameters for the spectrogram computation.
   n_mels: 128
   n_filters: 2048
   hop_length: 256
@@ -15,9 +13,7 @@ feats :
   f_min': 0
   f_max': 8000
   duration': 30
-
-# Training and model parameters
-training: 
+training: # Training and model parameters
   batch_size: 12
   lr: 0.001
   epochs: 100
