@@ -24,6 +24,7 @@ def vgg16(nb_classes):
 
 def train(model, optimizer, loader, writer, epochs=10):
     criterion = torch.nn.CrossEntropyLoss()
+    best_val_acc = 0
     for epoch in range(epochs):
         running_loss = []
         t = tqdm(loader)
@@ -37,6 +38,16 @@ def train(model, optimizer, loader, writer, epochs=10):
             optimizer.step()
             t.set_description(f'training loss: {mean(running_loss)}')
         writer.add_scalar('training loss', mean(running_loss), epochs)
+
+        # Validation step 
+        val_acc = test(model, val_dataloader)
+        print(f'Validation accuracy:{val_acc}')
+        writer.add_scalar('validation accuracy', val_acc, epochs)
+        writer.flush()
+
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            torch.save(model.state_dict(), 'best_model.pt')
 
 def test(model, dataloader):
     test_corrects = 0
@@ -80,6 +91,9 @@ if __name__ == "__main__":
     writer = SummaryWriter()
 
     train(model, optimizer, train_dataloader, writer, epochs=config['training']['epochs'])
+
+    # Load the best model
+    vgg16.load_state_dict(torch.load('best_model.pt'))
 
     test_acc = test(vgg16, test_dataloader)
     print(f'Test accuracy:{test_acc}')
