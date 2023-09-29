@@ -51,7 +51,7 @@ def test(model, dataloader):
 if __name__ == "__main__": 
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, default='config.yaml', help='Path to config file.')
+    parser.add_argument('--conf', type=str, default='conf.yaml', help='Path to config file.')
     args = parser.parse_args()
 
     config = yaml.load(open(args.config, 'r'))
