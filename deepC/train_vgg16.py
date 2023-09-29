@@ -54,7 +54,7 @@ if __name__ == "__main__":
     parser.add_argument('--config', type=str, default='conf.yaml', help='Path to config file.')
     args = parser.parse_args()
 
-    config = yaml.load(open(args.config, 'r'))
+    config = yaml.load(open(args.config, 'r'), Loader=yaml.FullLoader)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     train_dataloader = DataLoader(VehicleDataset(config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])

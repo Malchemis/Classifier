@@ -188,7 +188,7 @@ if __name__ == "__main__":
     parser.add_argument('--config', type=str, default='conf.yaml', help='Path to config file.')
     args = parser.parse_args()
 
-    config = yaml.load(open(args.config, 'r'))
+    config = yaml.load(open(args.config, 'r'), Loader=yaml.FullLoader)
 
     # Load the annotations in a pandas dataframe
     labels = pd.read_csv(config['data']['annotation_path'], sep='\t')
