@@ -28,6 +28,7 @@ def train(model, optimizer, loader, writer, epochs=10):
     total = 0
     best_val_acc = 0
     for epoch in range(epochs):
+        print(f'Epoch {epoch}/{epochs}')
         running_loss = []
         data = tqdm(loader)
         for features, labels in data:
@@ -48,6 +49,7 @@ def train(model, optimizer, loader, writer, epochs=10):
         accuracy = corrects / total
         writer.add_scalar('training loss', mean(running_loss), epochs)
         writer.add_scalar('training accuracy', accuracy, epochs)
+        print(f'Training accuracy:{accuracy}')
 
         # Validation step 
         val_acc = test(model, val_dataloader)
@@ -100,7 +102,7 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=config['training']['lr'])
     writer = SummaryWriter()
 
-    #train(model, optimizer, train_dataloader, writer, epochs=config['training']['epochs'])
+    train(model, optimizer, train_dataloader, writer, epochs=config['training']['epochs'])
 
     # Load the best model
     model.load_state_dict(torch.load('best_model.pt'))
