@@ -1,5 +1,7 @@
 import argparse
+import os
 import yaml
+import pickle
 from tqdm import tqdm
 
 from statistics import mean
@@ -59,11 +61,17 @@ if __name__ == "__main__":
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print(f'Using {device}')
 
-    train_dataloader = DataLoader(VehicleDataset(config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
-    val_dataloader = DataLoader(VehicleDataset(config, set='val'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
-    test_dataloader = DataLoader(VehicleDataset(config, set='test'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
-    print(f'Train set size: {len(train_dataloader)}')
+    if os.path.exists(config['data']['partitions.pkl']):
+        with open(config['data']['partitions.pkl'], 'rb') as f:
+            partition = pickle.load(f)
+    else:
+        raise ValueError(f'No partitions found at {config["data"]["partitions.pkl"]}')
+
+    train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
+    val_dataloader = DataLoader(VehicleDataset(partition, config, set='val'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
+    test_dataloader = DataLoader(VehicleDataset(partition, config, set='test'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
     
     model = vgg16(len(config['data']['classes'])).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=config['training']['lr'])

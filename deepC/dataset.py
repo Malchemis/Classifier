@@ -1,13 +1,11 @@
 import os
-
-import pandas as pd
 import numpy as np
 
 from torch.utils.data import Dataset
 
 class VehicleDataset(Dataset): 
-    def __init__(self, config, set='train'):
-        self.partition = config['data']['partition'][set]
+    def __init__(self, partition, config, set='train'):
+        self.partition = partition[set]
         self.data_dir = config['data']['data_dir']
         self.set = set
         self.n_frames = config['training']['n_frames']

@@ -80,7 +80,7 @@ def generate_partitions(labels, config):
     train, val, test = generate_split(labels, config)
 
     # Get the partitions
-    if not os.path.exists(config['data']['data_dir'] + 'partitions.pkl'):
+    if not os.path.exists(config['data']['partitions.pkl']):
         partitions = {'train': [], 'val': [], 'test': []}
 
         partitions['train'] = [(filename, class_value) for filename, class_value in zip(train[config['data']['header'][0]], train[config['data']['header'][1]])]
@@ -88,10 +88,10 @@ def generate_partitions(labels, config):
         partitions['test'] = [(filename, class_value) for filename, class_value in zip(test[config['data']['header'][0]], test[config['data']['header'][1]])]
         
         # Save the partitions
-        with open(config['data']['data_dir'] + 'partitions.pkl', 'wb') as f:
+        with open(config['data']['partitions.pkl'], 'wb') as f:
             pickle.dump(partitions, f)
     else:
-        with open(config['data']['data_dir'] + 'partitions.pkl', 'rb') as f:
+        with open(config['data']['partitions.pkl'], 'rb') as f:
             partitions = pickle.load(f)
 
     # Verify the partitions
