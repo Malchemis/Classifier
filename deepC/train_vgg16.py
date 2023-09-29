@@ -24,20 +24,30 @@ def vgg16(nb_classes):
 
 def train(model, optimizer, loader, writer, epochs=10):
     criterion = torch.nn.CrossEntropyLoss()
+    corrects = 0
+    total = 0
     best_val_acc = 0
     for epoch in range(epochs):
         running_loss = []
-        t = tqdm(loader)
-        for x, y in t:
-            x, y = x.to(device), y.to(device)
-            outputs = model(x)
-            loss = criterion(outputs, y)
+        data = tqdm(loader)
+        for features, labels in data:
+            features, labels = features.to(device), labels.to(device)
+            # Forward pass
+            outputs = model(features)
+            _, preds = torch.max(outputs, 1)
+            # Statistics to compute accuracy and loss
+            corrects += preds.eq(labels).sum().item()
+            total += labels.size(0)
+            loss = criterion(outputs, labels)
             running_loss.append(loss.item())
+            # Backward pass
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            t.set_description(f'training loss: {mean(running_loss)}')
+            data.set_description(f'training loss: {mean(running_loss)}')
+        accuracy = corrects / total
         writer.add_scalar('training loss', mean(running_loss), epochs)
+        writer.add_scalar('training accuracy', accuracy, epochs)
 
         # Validation step 
         val_acc = test(model, val_dataloader)
@@ -53,12 +63,12 @@ def test(model, dataloader):
     test_corrects = 0
     total = 0
     with torch.no_grad():
-        for x, y in dataloader:
-            x = x.to(device)
-            y = y.to(device)
-            y_hat = model(x).argmax(1)
-            test_corrects += y_hat.eq(y).sum().item()
-            total += y.size(0)
+        for features, labels in dataloader:
+            features = features.to(device)
+            labels = labels.to(device)
+            preds = model(features).argmax(1)
+            test_corrects += preds.eq(labels).sum().item()
+            total += labels.size(0)
     return test_corrects / total
 
 if __name__ == "__main__": 
