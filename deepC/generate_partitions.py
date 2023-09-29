@@ -147,8 +147,8 @@ def get_log_melspectrogram(audio, sample_rate, window_size, hop_size, n_mels, f_
 
 def get_log_melspectrogram_set(set, save_path, config): 
     """Compute log melspectrogram of a set of audio signals."""
-    for i, filename in enumerate(set[config['data']['header'][0]].unique()):
-        print(f"\rConstructing mel audio {i+1}/{len(set[config['data']['header'][0]].unique())}", flush=True)
+    for i, (filename, _) in enumerate(set):
+        print(f"\rConstructing mel audio {i+1}/{len(set)}", flush=True)
         audio, sr = torchaudio.load(os.path.join(config['data']['data_dir'] + filename))
         if sr != config['feats']['sample_rate']:
             resampled_audio = Resample(sr, config['feats']['sample_rate'])(audio)
