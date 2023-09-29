@@ -193,7 +193,7 @@ if __name__ == "__main__":
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     # Load the annotations in a pandas dataframe
-    labels = pd.read_csv(config['data']['annotation_path'], sep='\t')
+    labels = pd.read_csv(config['data']['annotations_path'], sep='\t')
 
     # Verify the data
     verifiy_data(labels, config)
