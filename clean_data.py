@@ -98,6 +98,12 @@ if __name__ == "__main__":
     csv_file  = remove_NaN_filename(csv_file)
     csv_file = remove_0_vehicle_class(csv_file)
 
+    print('Delete non existing files')
+    print('----------------------------------------------')
     delete_files_from_folders(csv_file, args.basedir)
+    print('Delete empty files')
+    print('----------------------------------------------')
     delete_empty_files(path_csv, args.basedir)
+    print('Delete short files')
+    print('----------------------------------------------')
     delete_short_files(path_csv, args.basedir)
