@@ -149,7 +149,7 @@ def get_log_melspectrogram_set(set, save_path, config):
     """Compute log melspectrogram of a set of audio signals."""
     for i, (filename, _) in enumerate(set):
         print(f"\rConstructing mel audio {i+1}/{len(set)}", flush=True)
-        audio, sr = torchaudio.load(os.path.join(config['data']['data_dir'] + filename))
+        audio, sr = torchaudio.load(os.path.join(config['data']['data_dir'], filename))
         if sr != config['feats']['sample_rate']:
             resampled_audio = Resample(sr, config['feats']['sample_rate'])(audio)
         resampled_audio_pad, *_ = pad_audio(
@@ -172,15 +172,15 @@ def get_log_melspectrogram_set(set, save_path, config):
         np.save(f"{save_path}/{filename.split('/')[-1].replace('.wav', '')}.npy", log_melspectrogram.numpy())
 
 def compute_all_log_melspectrogram(partitions, config): 
-    if not os.path.exists(os.path.join(config['data']['data_dir'] + 'npy', 'train')):
+    if not os.path.exists(os.path.join(config['data']['data_dir'], 'npy', 'train')):
         print("Constructing mel audio for train set")
-        get_log_melspectrogram_set(partitions['train'], os.path.join(config['data']['data_dir'] + 'npy', 'train'), config)
-    if not os.path.exists(os.path.join(config['data']['data_dir'] + 'npy', 'val')):    
+        get_log_melspectrogram_set(partitions['train'], os.path.join(config['data']['data_dir'], 'npy', 'train'), config)
+    if not os.path.exists(os.path.join(config['data']['data_dir'], 'npy', 'val')):    
         print("Constructing mel audio for val set")
-        get_log_melspectrogram_set(partitions['val'], os.path.join(config['data']['data_dir'] + 'npy', 'val'), config)
-    if not os.path.exists(os.path.join(config['data']['data_dir'] + 'npy', 'test')):
+        get_log_melspectrogram_set(partitions['val'], os.path.join(config['data']['data_dir'], 'npy', 'val'), config)
+    if not os.path.exists(os.path.join(config['data']['data_dir'], 'npy', 'test')):
         print("Constructing mel audio for test set")
-        get_log_melspectrogram_set(partitions['test'], os.path.join(config['data']['data_dir'] + 'npy', 'test'), config)
+        get_log_melspectrogram_set(partitions['test'], os.path.join(config['data']['data_dir'], 'npy', 'test'), config)
 
 if __name__ == "__main__": 
 
