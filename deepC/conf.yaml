@@ -1,7 +1,7 @@
 data: 
-  data_dir: '../../SED-single_vehicle-30_sec/'
-  annotations_path: '../../SED-single_vehicle-30_sec/weak_labels.csv'
-  partition: '../SED-single_vehicle-30_sec/partition.pkl'
+  data_dir: '/media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec'
+  annotations_path: '/media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec/weak_labels.csv'
+  partition: '/media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec/partitions.pkl'
   classes: [1, 2, 5, 12, 15]
   header: ['filepath_wav_30', 'vehicle_class', 'vehicle_class_combo', 'vehicle_class_base', 'speed']
 feats: # Parameters for the spectrogram computation.
@@ -16,7 +16,7 @@ feats: # Parameters for the spectrogram computation.
 training: # Training and model parameters
   batch_size: 12
   lr: 0.001
-  epochs: 100
+  epochs: 10
   num_workers: 4
   n_frames: 1876
   seed: 42

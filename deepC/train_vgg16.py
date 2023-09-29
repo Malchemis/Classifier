@@ -64,12 +64,12 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'Using {device}')
 
-    if os.path.exists(config['data']['partitions.pkl']):
-        with open(config['data']['partitions.pkl'], 'rb') as f:
+    if os.path.exists(config['data']['partition']):
+        with open(config['data']['partition'], 'rb') as f:
             partition = pickle.load(f)
-        print(f'Loaded partitions from {config["data"]["partitions.pkl"]}')
+        print(f'Loaded partitions from {config["data"]["partition"]}')
     else:
-        raise ValueError(f'No partitions found at {config["data"]["partitions.pkl"]}')
+        raise ValueError(f'No partitions found at {config["data"]["partition"]}')
 
     train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
     val_dataloader = DataLoader(VehicleDataset(partition, config, set='val'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
