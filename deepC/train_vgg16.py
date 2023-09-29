@@ -100,7 +100,7 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=config['training']['lr'])
     writer = SummaryWriter()
 
-    #train(model, optimizer, train_dataloader, writer, epochs=config['training']['epochs'])
+    train(model, optimizer, train_dataloader, writer, epochs=config['training']['epochs'])
 
     # Load the best model
     model.load_state_dict(torch.load('best_model.pt'))
