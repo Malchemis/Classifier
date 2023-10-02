@@ -16,7 +16,7 @@ from torchsummary import summary
 
 def vgg16(nb_classes):
     # Load VGG16 model 
-    vgg16 = torchvision.models.get_model('vgg16', weights=None)
+    vgg16 = torchvision.models.get_model('vgg19', weights=None)
     # Change the input layer
     vgg16.features[0] = torch.nn.Conv2d(1, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
     # Modify the last layer
