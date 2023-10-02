@@ -16,7 +16,7 @@ from torchsummary import summary
 
 def vgg16(nb_classes):
     # Load VGG16 model 
-    vgg16 = torchvision.models.get_model('vgg19', weights=None)
+    vgg16 = torchvision.models.get_model('vgg16', weights=None)
     # Change the input layer
     vgg16.features[0] = torch.nn.Conv2d(1, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
     # Modify the last layer
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     val_dataloader = DataLoader(VehicleDataset(partition, config, set='val'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
     test_dataloader = DataLoader(VehicleDataset(partition, config, set='test'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
     
-    model = vgg16(len(config['data']['classes'])).to(device)
+    model = vgg11(len(config['data']['classes'])).to(device)
     print(model)
     print(summary(model, train_dataloader.dataset[0][0].shape))
     # optimizer = torch.optim.Adam(model.parameters(), lr=config['training']['lr'])
