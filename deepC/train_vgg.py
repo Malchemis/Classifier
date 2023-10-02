@@ -12,6 +12,7 @@ import torch
 import torchvision
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
+from torchsummary import summary
 
 def vgg16(nb_classes):
     # Load VGG16 model 
@@ -109,6 +110,7 @@ if __name__ == "__main__":
     
     model = vgg11(len(config['data']['classes'])).to(device)
     print(model)
+    summary(model, train_dataloader.dataset[0][0].shape)
     optimizer = torch.optim.Adam(model.parameters(), lr=config['training']['lr'])
     writer = SummaryWriter()
 
