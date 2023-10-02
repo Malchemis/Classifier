@@ -1,6 +1,8 @@
 data: 
+  dataset: 'vehicle'
   data_dir: '../../SED-single_vehicle-30_sec'
   annotations_path: '../../SED-single_vehicle-30_sec/weak_labels.csv'
+  test_annotations_path: '../../SED-single_vehicle-30_sec/weak_labels_test.csv'
   partition: '../../SED-single_vehicle-30_sec/partitions.pkl'
   classes: [1, 2, 5, 12, 15]
   header: ['filepath_wav_30', 'vehicle_class', 'vehicle_class_combo', 'vehicle_class_base', 'speed']

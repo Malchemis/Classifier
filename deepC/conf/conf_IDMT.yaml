@@ -1,0 +1,24 @@
+data: 
+  dataset: 'IDMT'
+  data_dir: '/media/huimin/PortableSSD/KTH/data/IDMT_Traffic'
+  annotations_path: '/media/huimin/PortableSSD/KTH/data/IDMT_Traffic/annotation/vehicle_train.csv'
+  test_annotations_path: '/media/huimin/PortableSSD/KTH/data/IDMT_Traffic/annotation/vehicle_test.csv'
+  partition: '/media/huimin/PortableSSD/KTH/data/IDMT_Traffic/partitions.pkl'
+  classes: ['C', 'M', 'T']
+  header: ['filename', 'vehicle_class']
+feats: # Parameters for the spectrogram computation.
+  n_mels: 16
+  n_filters: 2048
+  hop_length: 512 
+  n_window: 1024 
+  sample_rate: 22050
+  f_min: 0
+  f_max: 8000
+  duration: 2
+training: # Training and model parameters
+  batch_size: 12
+  lr: 0.001
+  epochs: 100
+  num_workers: 4
+  n_frames: 1876
+  seed: 42

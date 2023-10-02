@@ -31,7 +31,7 @@ def verifiy_data(labels, config):
         print('Classes in classes variable: {}'.format(config['data']['classes']))
         raise ValueError('The classes are not the same as the ones in the annotations file.')
     
-def generate_split(labels, config, split_size= [0.7, 0.1, 0.2]):
+def generate_split(labels, config, split_size= [0.7, 0.1, 0.2], generate_test=True):
     """
     Generate the train, validation and test splits.
     The train split will be used to train the model, the validation split 
@@ -44,10 +44,14 @@ def generate_split(labels, config, split_size= [0.7, 0.1, 0.2]):
         split_size (list): The size of the splits [train, val, test]. The default is [0.7, 0.1, 0.2].
     """
 
-    # Split the dataset into train and test
-    train, test = train_test_split(labels, test_size=split_size[2], random_state=config['training']['seed'])
-    # Split the train dataset into train and validation
-    train, val = train_test_split(train, test_size=0.1, random_state=config['training']['seed'])
+    if generate_test: 
+        # Split the dataset into train and test
+        train, test = train_test_split(labels, test_size=split_size[2], random_state=config['training']['seed'])
+        # Split the train dataset into train and validation
+        train, val = train_test_split(train, test_size=0.1, random_state=config['training']['seed'])
+    else: 
+        train, val = train_test_split(labels, test_size=split_size[1], random_state=config['training']['seed'])
+        test = pd.DataFrame()
 
     train.reset_index(drop=True, inplace=True)
     val.reset_index(drop=True, inplace=True)
@@ -62,22 +66,23 @@ def generate_split(labels, config, split_size= [0.7, 0.1, 0.2]):
 
     return train, val, test
 
-def generate_partitions(labels, config): 
+def generate_partitions(train, val, test, config): 
     """
     Generate the partitions.
     The partitions will be together, identified by 3 keys (train, val, test) and the values will be the couple (filename, class).
     
     Args:
-        labels (pandas dataframe): The dataframe containing the annotations.
+        train (pandas dataframe): The dataframe containing the train annotations.
+        val (pandas dataframe): The dataframe containing the validation annotations.
+        test (pandas dataframe): The dataframe containing the test annotations.
         config (dict): The configuration dictionary.
     """
 
     # Convert classes to be in range [0, num_classes - 1]
     # This is necessary for the cross-entropy loss.
-    labels[config['data']['header'][1]] = labels[config['data']['header'][1]].apply(lambda x: config['data']['classes'].index(x))
-
-    # Get the split of the labels 
-    train, val, test = generate_split(labels, config)
+    train[config['data']['header'][1]] = train[config['data']['header'][1]].apply(lambda x: config['data']['classes'].index(x))
+    val[config['data']['header'][1]] = val[config['data']['header'][1]].apply(lambda x: config['data']['classes'].index(x))
+    test[config['data']['header'][1]] = test[config['data']['header'][1]].apply(lambda x: config['data']['classes'].index(x))
 
     # Get the partitions
     if not os.path.exists(config['data']['partition']):
@@ -93,10 +98,6 @@ def generate_partitions(labels, config):
     else:
         with open(config['data']['partition'], 'rb') as f:
             partitions = pickle.load(f)
-
-    # Verify the partitions
-    if len(partitions['train']) + len(partitions['val']) + len(partitions['test']) != len(labels):
-        print('The partitions are not correct.')
 
     return partitions
 
@@ -150,13 +151,19 @@ def get_log_melspectrogram_set(set, save_path, config):
     for i, (filename, _) in enumerate(set):
         print(f"\rConstructing mel audio {i+1}/{len(set)}", flush=True)
         audio, sr = torchaudio.load(os.path.join(config['data']['data_dir'], filename))
+        # Convert to mono if necessary
+        if audio.shape[0] > 1:
+            audio = torch.mean(audio, dim=0, keepdim=True)
+        # Resample the audio if necessary
         if sr != config['feats']['sample_rate']:
             resampled_audio = Resample(sr, config['feats']['sample_rate'])(audio)
+        # Pad the audio if necessary
         resampled_audio_pad, *_ = pad_audio(
                                     resampled_audio, 
                                     config['feats']['duration']*config['feats']['sample_rate'], 
                                     config['feats']['sample_rate']
                                 )
+        # Compute the log melspectrogram
         log_melspectrogram = get_log_melspectrogram(
                                 resampled_audio_pad, 
                                 config['feats']['sample_rate'], 
@@ -185,7 +192,7 @@ def compute_all_log_melspectrogram(partitions, config):
 if __name__ == "__main__": 
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, default='conf.yaml', help='Path to config file.')
+    parser.add_argument('--config', type=str, default='conf/conf.yaml', help='Path to config file.')
     args = parser.parse_args()
 
     # Open the config file 
@@ -197,9 +204,17 @@ if __name__ == "__main__":
 
     # Verify the data
     verifiy_data(labels, config)
+
+    # Generate the splits
+    if config['data']['dataset'] == 'vehicle':
+        train, val, test = generate_split(labels, config, generate_test=config['data']['generate_test'])
+    elif config['data']['dataset'] == 'IDMT':
+        train, val, _ = generate_split(labels, config, split_size= [0.8, 0.2], generate_test=False)
+        # Load the test csv file
+        test = pd.read_csv(config['data']['test_annotations_path'], sep='\t')
     
     # Generate the partitions
-    partitions = generate_partitions(labels, config)
+    partitions = generate_partitions(train, val, test, config)
 
     # Compute the log melspectrogram for each set
     compute_all_log_melspectrogram(partitions, config)
