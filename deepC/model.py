@@ -66,6 +66,7 @@ class VGG(nn.Module):
         self.fc_layers = nn.Sequential(*fc_layers)
 
     def forward(self, x):
+        print(self.layers)
         output = self.layers(x)
         output = output.view(output.size(0), -1)
         output = self.fc_layers(output)
