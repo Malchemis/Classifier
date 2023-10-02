@@ -1,12 +1,22 @@
-data: 
-  dataset: 'vehicle'
-  data_dir: '../../SED-single_vehicle-30_sec'
-  annotations_path: '../../SED-single_vehicle-30_sec/weak_labels.csv'
-  test_annotations_path: '../../SED-single_vehicle-30_sec/weak_labels_test.csv'
-  partition: '../../SED-single_vehicle-30_sec/partitions.pkl'
-  classes: [1, 2, 5, 12, 15]
-  header: ['filepath_wav_30', 'vehicle_class', 'vehicle_class_combo', 'vehicle_class_base', 'speed']
-feats: # Parameters for the spectrogram computation.
+data:
+  dataset: vehicle
+  data_dir: /media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec
+  annotations_path: /media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec/weak_labels.csv
+  test_annotations_path: /media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec/weak_labels_test.csv
+  partition: /media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec/partitions.pkl
+  classes:
+  - 1
+  - 2
+  - 5
+  - 12
+  - 15
+  header:
+  - filepath_wav_30
+  - vehicle_class
+  - vehicle_class_combo
+  - vehicle_class_base
+  - speed
+feats:
   n_mels: 128
   n_filters: 2048
   hop_length: 256
@@ -15,7 +25,7 @@ feats: # Parameters for the spectrogram computation.
   f_min: 0
   f_max: 8000
   duration: 30
-training: # Training and model parameters
+training:
   batch_size: 12
   lr: 0.001
   epochs: 100

@@ -189,6 +189,22 @@ def compute_all_log_melspectrogram(partitions, config):
         print("Constructing mel audio for test set")
         get_log_melspectrogram_set(partitions['test'], os.path.join(config['data']['data_dir'], 'npy', 'test'), config)
 
+def find_n_frames(partitions, config):
+    """Find the number of frames in the dataset."""
+    n_frames = []
+    for i, (filename, _) in enumerate(partitions['train']):
+        log_melspectrogram = np.load(os.path.join(config['data']['data_dir'], 'npy', 'train', filename.split('/')[-1].replace('.wav', '') + '.npy'))
+        n_frames.append(log_melspectrogram.shape[2])
+    return min(n_frames)
+
+def add_n_frames_in_yaml(n_frames, config):
+    """Add the number of frames in the dataset to the config file."""
+    with open(config, 'r') as f:
+        config_yaml = yaml.safe_load(f)
+        config_yaml['training']['n_frames'] = n_frames
+    with open(config, 'w') as f:
+        yaml.dump(config_yaml, f, sort_keys=False)
+
 if __name__ == "__main__": 
 
     parser = argparse.ArgumentParser()
@@ -197,7 +213,7 @@ if __name__ == "__main__":
 
     # Open the config file 
     with open(args.config, 'r') as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
+        config = yaml.safe_load(f)
 
     # Load the annotations in a pandas dataframe
     labels = pd.read_csv(config['data']['annotations_path'], sep='\t')
@@ -207,7 +223,7 @@ if __name__ == "__main__":
 
     # Generate the splits
     if config['data']['dataset'] == 'vehicle':
-        train, val, test = generate_split(labels, config, generate_test=config['data']['generate_test'])
+        train, val, test = generate_split(labels, config, generate_test=True)
     elif config['data']['dataset'] == 'IDMT':
         train, val, _ = generate_split(labels, config, split_size= [0.8, 0.2], generate_test=False)
         # Load the test csv file
@@ -218,3 +234,7 @@ if __name__ == "__main__":
 
     # Compute the log melspectrogram for each set
     compute_all_log_melspectrogram(partitions, config)
+
+    # Find the number of frames in the dataset and add it to the config file
+    n_frames = find_n_frames(partitions, config)
+    add_n_frames_in_yaml(n_frames, args.config)
