@@ -5,6 +5,7 @@ import pickle
 
 from dataset import VehicleDataset
 
+import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchsummary import summary
@@ -88,7 +89,8 @@ if __name__ == "__main__":
     else:
         raise ValueError(f'No partitions found at {config["data"]["partition"]}')
 
-    vgg = VGG(1, 5)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    vgg = VGG(1, 5).to(device)
     print(vgg)
     
     train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
