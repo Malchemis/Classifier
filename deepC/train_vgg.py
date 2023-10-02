@@ -110,7 +110,7 @@ if __name__ == "__main__":
     
     model = vgg11(len(config['data']['classes'])).to(device)
     print(model)
-    summary(model, train_dataloader.dataset[0][0].shape)
+    print(summary(model, train_dataloader.dataset[0][0].shape))
     optimizer = torch.optim.Adam(model.parameters(), lr=config['training']['lr'])
     writer = SummaryWriter()
 
