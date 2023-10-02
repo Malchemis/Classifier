@@ -94,4 +94,5 @@ if __name__ == "__main__":
     print(vgg)
     
     train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
+    print(f"Shape of the first batch: {next(iter(train_dataloader))[0].shape}")
     print(summary(vgg, train_dataloader.dataset[0][0].shape))
