@@ -1,9 +1,9 @@
 data:
   dataset: IDMT
-  data_dir: /media/huimin/PortableSSD/KTH/data/IDMT_Traffic
-  annotations_path: /media/huimin/PortableSSD/KTH/data/IDMT_Traffic/annotation/vehicle_train.csv
-  test_annotations_path: /media/huimin/PortableSSD/KTH/data/IDMT_Traffic/annotation/vehicle_test.csv
-  partition: /media/huimin/PortableSSD/KTH/data/IDMT_Traffic/partitions.pkl
+  data_dir: ../../IDMT_Traffic
+  annotations_path: ../../IDMT_Traffic/annotation/vehicle_train.csv
+  test_annotations_path: ../../IDMT_Traffic/annotation/vehicle_test.csv
+  partition: ../../IDMT_Traffic/partitions.pkl
   classes:
   - C
   - M

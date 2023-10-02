@@ -1,9 +1,9 @@
 data:
   dataset: vehicle
-  data_dir: /media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec
-  annotations_path: /media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec/weak_labels.csv
-  test_annotations_path: /media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec/weak_labels_test.csv
-  partition: /media/huimin/PortableSSD/KTH/data/SED-single_vehicle-30_sec/partitions.pkl
+  data_dir: ../../SED-single_vehicle-30_sec
+  annotations_path: ../../SED-single_vehicle-30_sec/weak_labels.csv
+  test_annotations_path: ../../SED-single_vehicle-30_sec/weak_labels_test.csv
+  partition: ../../SED-single_vehicle-30_sec/partitions.pkl
   classes:
   - 1
   - 2
