@@ -58,7 +58,7 @@ def train(model, optimizer, loader, writer, save_path= 'best_model.pt', epochs=1
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), os.path.join('weights', save_path))
+            torch.save(model.state_dict(), os.path.join(save_path))
 
         return train_acc, val_acc
 
@@ -110,12 +110,12 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=config['training']['lr'])
     writer = SummaryWriter()
 
+    if not os.path.exists('weights'):
+        os.makedirs('weights')
     path_weights = os.path.join('weights', config['data']['dataset'] + '_best_model.pt')
 
     # Train the model
     if not args.only_test:
-        if not os.path.exists('weights'):
-            os.makedirs('weights')
 
         train_acc, val_acc = train(model, optimizer, train_dataloader, writer, save_path=path_weights, epochs=config['training']['epochs'])
 
