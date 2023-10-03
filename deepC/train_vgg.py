@@ -60,7 +60,7 @@ def train(model, optimizer, loader, writer, save_path= 'best_model.pt', epochs=1
             best_val_acc = val_acc
             torch.save(model.state_dict(), os.path.join(save_path))
 
-        return train_acc, val_acc
+        return train_acc_list, val_acc_list
 
 def test(model, dataloader):
     test_corrects = 0
