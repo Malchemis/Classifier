@@ -22,8 +22,8 @@ def train(model, optimizer, loader, writer, save_path= 'best_model.pt', epochs=1
     corrects = 0
     total = 0
     best_val_acc = 0
-    train_acc = []
-    val_acc = []
+    train_acc_list = []
+    val_acc_list = []
     for epoch in range(epochs):
         print(f'Epoch {epoch}/{epochs}')
         running_loss = []
@@ -44,14 +44,14 @@ def train(model, optimizer, loader, writer, save_path= 'best_model.pt', epochs=1
             optimizer.step()
             data.set_description(f'training loss: {mean(running_loss)}')
         accuracy = corrects / total
-        train_acc.append(accuracy)
+        train_acc_list.append(accuracy)
         writer.add_scalar('training loss', mean(running_loss), epochs)
         writer.add_scalar('training accuracy', accuracy, epochs)
         print(f'Training accuracy:{accuracy}')
 
         # Validation step 
         val_acc = test(model, val_dataloader)
-        val_acc.append(val_acc)
+        val_acc_list.append(val_acc)
         print(f'Validation accuracy:{val_acc}')
         writer.add_scalar('validation accuracy', val_acc, epochs)
         writer.flush()
