@@ -93,10 +93,10 @@ if __name__ == "__main__":
     test_dataloader = DataLoader(VehicleDataset(partition, config, set='test'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
     
     num_channels = 1
-    num_classes = len(partition['data']['classes'])
+    num_classes = len(config['data']['classes'])
     model = VGG(num_channels, num_classes).to(device)
     print(model)
-    print(summary(model, train_dataloader.dataset[0][0].shape))
+    summary(model, train_dataloader.dataset[0][0].shape)
     optimizer = torch.optim.Adam(model.parameters(), lr=config['training']['lr'])
     writer = SummaryWriter()
 

@@ -41,15 +41,15 @@ class VGG(nn.Module):
         base_features = 32
 
         layers.append(ConvBlock(input_features=num_channels, output_features=base_features, kernel=3, padding=1, stride=1))
-        layers.append(ConvBlock(input_features=base_features, output_features=base_features, kernel=3, padding=1, stride=1))
+        layers.append(ConvBlock(input_features=base_features, output_features=2*base_features, kernel=3, padding=1, stride=1))
         layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
 
         layers.append(ConvBlock(input_features=2*base_features, output_features=2*base_features, kernel=3, padding=1, stride=1))
-        layers.append(ConvBlock(input_features=2*base_features, output_features=2*base_features, kernel=3, padding=1, stride=1))
+        layers.append(ConvBlock(input_features=2*base_features, output_features=4*base_features, kernel=3, padding=1, stride=1))
         layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
 
         layers.append(ConvBlock(input_features=4*base_features, output_features=4*base_features, kernel=3, padding=1, stride=1))
-        layers.append(ConvBlock(input_features=4*base_features, output_features=4*base_features, kernel=3, padding=1, stride=1))
+        layers.append(ConvBlock(input_features=4*base_features, output_features=8*base_features, kernel=3, padding=1, stride=1))
         layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
 
         layers.append(ConvBlock(input_features=8*base_features, output_features=8*base_features, kernel=3, padding=1, stride=1))
@@ -66,7 +66,6 @@ class VGG(nn.Module):
         self.fc_layers = nn.Sequential(*fc_layers)
 
     def forward(self, x):
-        print(self.layers)
         output = self.layers(x)
         output = output.view(output.size(0), -1)
         output = self.fc_layers(output)
@@ -90,10 +89,12 @@ if __name__ == "__main__":
     else:
         raise ValueError(f'No partitions found at {config["data"]["partition"]}')
 
+    num_channels = 1
+    num_classes = len(config['data']['classes'])
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    vgg = VGG(1, 5).to(device)
+    vgg = VGG(num_channels, num_classes).to(device)
     print(vgg)
     
     train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
     print(f"Shape of the first batch: {next(iter(train_dataloader))[0].shape}")
-    print(summary(vgg, train_dataloader.dataset[0][0].shape))
+    summary(vgg, train_dataloader.dataset[0][0].shape)
