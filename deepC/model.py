@@ -58,8 +58,8 @@ class VGG(nn.Module):
 
         layers.append(nn.AdaptiveAvgPool2d(2))
 
-        fc_layers.extend([nn.Linear(in_features=2*2*(8*base_features), out_features= base_features*base_features), nn.ReLU()])
-        fc_layers.extend([nn.Linear(in_features=base_features*base_features, out_features= base_features*base_features), nn.ReLU()])
+        fc_layers.extend([nn.Linear(in_features=2*2*(8*base_features), out_features= base_features*base_features), nn.ReLU(), nn.Dropout(0.5)])
+        fc_layers.extend([nn.Linear(in_features=base_features*base_features, out_features= base_features*base_features), nn.ReLU(), nn.Dropout(0.5)])
         fc_layers.extend([nn.Linear(in_features=base_features*base_features, out_features= self.num_classes)])
 
         self.layers = nn.Sequential(*layers)

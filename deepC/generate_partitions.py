@@ -125,14 +125,14 @@ def pad_audio(audio, target_len, fs):
     offset_s = round(onset_s + (target_len / fs), 3)
     return audio, onset_s, offset_s, padded_indx
 
-def get_log_melspectrogram(audio, sample_rate, window_size, hop_size, n_mels, f_min, f_max):
+def get_log_melspectrogram(audio, sample_rate, n_fft, hop_length, n_mels, f_min, f_max):
     """Compute log melspectrogram of an audio signal."""
     # Compute the mel spectrogram
     mel_spectrogram = MelSpectrogram(
         sample_rate=sample_rate,
-        n_fft=window_size,
-        win_length=window_size,
-        hop_length=hop_size,
+        n_fft=n_fft,
+        win_length=n_fft,
+        hop_length=hop_length,
         f_min=f_min,
         f_max=f_max,
         n_mels=n_mels,

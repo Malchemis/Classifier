@@ -17,18 +17,17 @@ data:
   - vehicle_class_base
   - speed
 feats:
-  n_mels: 128
-  n_filters: 2048
-  hop_length: 256
-  n_window: 2048
+  duration: 30
   sample_rate: 16000
+  n_fft: 2048
+  hop_length: 256
+  n_mels: 128
   f_min: 0
   f_max: 8000
-  duration: 30
 training:
   batch_size: 12
   lr: 0.001
   epochs: 100
   num_workers: 4
-  n_frames: 1876
   seed: 42
+  n_frames: 1876
