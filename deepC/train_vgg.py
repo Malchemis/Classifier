@@ -30,6 +30,7 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
         train_data = tqdm(train_dataloader)
         for features, labels in train_data:
             features, labels = features.to(device), labels.to(device)
+            print('labels', labels)
             # Forward pass
             outputs = model(features)
             print('outputs', outputs)
