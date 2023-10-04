@@ -66,15 +66,17 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
 
     return train_acc_list, val_acc_list
 
-def test(model, test_dataloader):
+def test(config, model, test_dataloader):
     test_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']))
+    f1_score = torchmetrics.F1(task='multiclass', num_classes=len(config['data']['classes']))
     with torch.no_grad():
         for features, labels in test_dataloader:
             features, labels = features.to(device), labels.to(device)
-            preds = model(features).argmax(1)
-            test_corrects += preds.eq(labels).sum().item()
-            total += labels.size(0)
-    return test_corrects / total
+            outputs = model(features)
+            _, preds = torch.max(outputs, 1)
+            batch_test_acc = test_acc(preds, labels)
+            batch_f1_score = f1_score(preds, labels)
+    return test_acc.compute(), f1_score.compute()
 
 if __name__ == "__main__": 
 
@@ -133,11 +135,13 @@ if __name__ == "__main__":
 
         # Load the best model and test it
         model.load_state_dict(torch.load(path_weights))
-        test_acc = test(model, test_dataloader)
+        test_acc, test_f1 = test(config, model, test_dataloader)
         print(f'Test accuracy:{test_acc}')
+        print(f'Test F1 score:{test_f1}')
 
     else:
         # Load the best model and test it
         model.load_state_dict(torch.load(path_weights))
-        test_acc = test(model, test_dataloader)
+        test_acc, test_f1 = test(config, model, test_dataloader)
         print(f'Test accuracy:{test_acc}')
+        print(f'Test F1 score:{test_f1}')
