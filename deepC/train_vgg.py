@@ -11,64 +11,68 @@ from dataset import VehicleDataset
 from model import VGG
 
 import torch
-import torchvision
+import torchmetrics
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from torchsummary import summary
 
 
-def train(model, optimizer, loader, writer, save_path= 'best_model.pt', epochs=10):
+def train(config, model, optimizer, train_dataloader, val_dataloader, writer, save_path= 'best_model.pt', epochs=10):
     criterion = torch.nn.CrossEntropyLoss()
-    corrects = 0
-    total = 0
     best_val_acc = 0
     train_acc_list = []
     val_acc_list = []
+    train_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']))
+    val_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']))
     for epoch in range(epochs):
-        print(f'Epoch {epoch}/{epochs}')
+        print(f'Epoch {epoch}/{epochs} :')
         running_loss = []
-        data = tqdm(loader)
-        for features, labels in data:
+        train_data = tqdm(train_dataloader)
+        for features, labels in train_data:
             features, labels = features.to(device), labels.to(device)
             # Forward pass
             outputs = model(features)
+            print('outputs', outputs)
             _, preds = torch.max(outputs, 1)
+            print('preds', preds)
             # Statistics to compute accuracy and loss
-            corrects += preds.eq(labels).sum().item()
-            total += labels.size(0)
+            batch_train_acc = train_acc(preds, labels)
             loss = criterion(outputs, labels)
             running_loss.append(loss.item())
             # Backward pass
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            data.set_description(f'training loss: {mean(running_loss)}')
-        accuracy = corrects / total
-        train_acc_list.append(accuracy)
+            train_data.set_description(f'training loss: {mean(running_loss)}')
+        # Training accuracy of the epoch
+        total_train_acc = train_acc.compute()
         writer.add_scalar('training loss', mean(running_loss), epochs)
-        writer.add_scalar('training accuracy', accuracy, epochs)
-        print(f'Training accuracy:{accuracy}')
+        print(f'Training accuracy:{total_train_acc}')
+        train_acc_list.append(total_train_acc)
+
 
         # Validation step 
-        val_acc = test(model, val_dataloader)
-        val_acc_list.append(val_acc)
-        print(f'Validation accuracy:{val_acc}')
-        writer.add_scalar('validation accuracy', val_acc, epochs)
-        writer.flush()
+        for features, labels in val_dataloader:
+            features, labels = features.to(device), labels.to(device)
+            outputs = model(features)
+            _, preds = torch.max(outputs, 1)
+            batch_val_acc = val_acc(preds, labels)
+        
+        total_val_acc = val_acc.compute()
+        val_acc_list.append(total_val_acc)
+        print(f'Validation accuracy:{total_val_acc}')
 
-        if val_acc > best_val_acc:
+        if total_val_acc > best_val_acc:
             best_val_acc = val_acc
             torch.save(model.state_dict(), os.path.join(save_path))
 
     return train_acc_list, val_acc_list
 
-def test(model, dataloader):
-    test_corrects = 0
-    total = 0
+def test(model, test_dataloader):
+    test_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']))
     with torch.no_grad():
-        for features, labels in dataloader:
-            features = features.to(device)
-            labels = labels.to(device)
+        for features, labels in test_dataloader:
+            features, labels = features.to(device), labels.to(device)
             preds = model(features).argmax(1)
             test_corrects += preds.eq(labels).sum().item()
             total += labels.size(0)
@@ -117,7 +121,7 @@ if __name__ == "__main__":
     # Train the model
     if not args.only_test:
 
-        train_acc, val_acc = train(model, optimizer, train_dataloader, writer, save_path=path_weights, epochs=config['training']['epochs'])
+        train_acc, val_acc = train(config, model, optimizer, train_dataloader, writer, save_path=path_weights, epochs=config['training']['epochs'])
 
         # Plot the training and validation accuracy and save it 
         plt.plot(train_acc, color='b', label='Training accuracy')

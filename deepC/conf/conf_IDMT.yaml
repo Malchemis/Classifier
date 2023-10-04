@@ -15,6 +15,7 @@ feats:
   duration: 2
   sample_rate: 22050
   n_fft: 1024
+  win_length: 1024
   hop_length: 512
   n_mels: 16
   f_min: 0
