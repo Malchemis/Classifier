@@ -67,8 +67,8 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
     return train_acc_list, val_acc_list
 
 def test(config, model, test_dataloader):
-    test_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']))
-    f1_score = torchmetrics.F1(task='multiclass', num_classes=len(config['data']['classes']))
+    test_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes'])).to(device)
+    f1_score = torchmetrics.F1(task='multiclass', num_classes=len(config['data']['classes'])).to(device)
     with torch.no_grad():
         for features, labels in test_dataloader:
             features, labels = features.to(device), labels.to(device)
