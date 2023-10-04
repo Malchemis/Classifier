@@ -22,8 +22,8 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
     best_val_acc = 0
     train_acc_list = []
     val_acc_list = []
-    train_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes'])).to(device)
-    val_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes'])).to(device)
+    train_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average='macro').to(device)
+    val_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average='macro').to(device)
     for epoch in range(epochs):
         print(f'Epoch {epoch}/{epochs} :')
         running_loss = []
@@ -67,8 +67,8 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
     return train_acc_list, val_acc_list
 
 def test(config, model, test_dataloader):
-    test_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes'])).to(device)
-    f1_score = torchmetrics.F1Score(task='multiclass', num_classes=len(config['data']['classes'])).to(device)
+    test_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average='macro').to(device)
+    f1_score = torchmetrics.F1Score(task='multiclass', num_classes=len(config['data']['classes']), average='macro').to(device)
     with torch.no_grad():
         for features, labels in test_dataloader:
             features, labels = features.to(device), labels.to(device)
