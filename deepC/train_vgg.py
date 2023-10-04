@@ -75,9 +75,7 @@ def test(config, model, test_dataloader):
             outputs = model(features)
             _, preds = torch.max(outputs, 1)
             batch_test_acc = test_acc(preds, labels)
-            print(f'Test accuracy:{batch_test_acc}')
             batch_f1_score = f1_score(preds, labels)
-            print(f'Test F1 score:{batch_f1_score}')
     return test_acc.compute(), f1_score.compute()
 
 if __name__ == "__main__": 
@@ -138,6 +136,8 @@ if __name__ == "__main__":
         # Load the best model and test it
         model.load_state_dict(torch.load(path_weights))
         test_acc, test_f1 = test(config, model, test_dataloader)
+        print(f'Test accuracy:{test_acc}')
+        print(f'Test F1 score:{test_f1}')
 
     else:
         # Load the best model and test it
