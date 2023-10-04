@@ -69,6 +69,7 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
 def test(config, model, test_dataloader):
     acc_by_class = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average=None).to(device)
     test_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average='macro').to(device)
+    f1_by_class = torchmetrics.F1Score(task='multiclass', num_classes=len(config['data']['classes']), average=None).to(device)
     f1_score = torchmetrics.F1Score(task='multiclass', num_classes=len(config['data']['classes']), average='macro').to(device)
     with torch.no_grad():
         for features, labels in test_dataloader:
@@ -77,9 +78,10 @@ def test(config, model, test_dataloader):
             _, preds = torch.max(outputs, 1)
             batch_test_acc = test_acc(preds, labels)
             batch_f1_score = f1_score(preds, labels)
-            # Accuracy by class 
+            # Metrics by class 
             acc_by_class(preds, labels)
-    return test_acc.compute(), f1_score.compute(), acc_by_class.compute()
+            f1_by_class(preds, labels)
+    return test_acc.compute(), f1_score.compute(), acc_by_class.compute(), f1_by_class.compute()
 
 if __name__ == "__main__": 
 
@@ -138,7 +140,8 @@ if __name__ == "__main__":
 
     # Load the best model and test it
     model.load_state_dict(torch.load(path_weights))
-    test_acc, test_f1, acc_by_class = test(config, model, test_dataloader)
+    test_acc, test_f1, acc_by_class, f1_by_class = test(config, model, test_dataloader)
     print(f'Test accuracy:{test_acc}')
     print(f'Test F1 score:{test_f1}')
     print(f'Accuracy by class:{acc_by_class}')
+    print(f'F1 score by class:{f1_by_class}')
