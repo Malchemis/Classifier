@@ -26,8 +26,8 @@ feats:
   f_max: 8000
 training:
   batch_size: 12
-  lr: 0.001
-  epochs: 500
+  lr: 1e-05
+  epochs: 250
   num_workers: 4
   seed: 42
   n_frames: 1876
