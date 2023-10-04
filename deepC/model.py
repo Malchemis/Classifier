@@ -60,7 +60,7 @@ class VGG(nn.Module):
 
         fc_layers.extend([nn.Linear(in_features=2*2*(8*base_features), out_features= base_features*base_features), nn.ReLU(), nn.Dropout(0.5)])
         fc_layers.extend([nn.Linear(in_features=base_features*base_features, out_features= base_features*base_features), nn.ReLU(), nn.Dropout(0.5)])
-        fc_layers.extend([nn.Linear(in_features=base_features*base_features, out_features= self.num_classes)])
+        fc_layers.extend([nn.Linear(in_features=base_features*base_features, out_features= self.num_classes), nn.Softmax(dim=1)])
 
         self.layers = nn.Sequential(*layers)
         self.fc_layers = nn.Sequential(*fc_layers)
