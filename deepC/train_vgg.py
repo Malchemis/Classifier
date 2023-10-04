@@ -138,8 +138,6 @@ if __name__ == "__main__":
         # Load the best model and test it
         model.load_state_dict(torch.load(path_weights))
         test_acc, test_f1 = test(config, model, test_dataloader)
-        print(f'Test accuracy:{test_acc}')
-        print(f'Test F1 score:{test_f1}')
 
     else:
         # Load the best model and test it
