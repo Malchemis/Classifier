@@ -121,7 +121,7 @@ if __name__ == "__main__":
     # Train the model
     if not args.only_test:
 
-        train_acc, val_acc = train(config, model, optimizer, train_dataloader, writer, save_path=path_weights, epochs=config['training']['epochs'])
+        train_acc, val_acc = train(config, model, optimizer, train_dataloader, val_dataloader, writer, save_path=path_weights, epochs=config['training']['epochs'])
 
         # Plot the training and validation accuracy and save it 
         plt.plot(train_acc, color='b', label='Training accuracy')
