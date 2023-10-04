@@ -22,6 +22,7 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
     best_val_acc = 0
     train_acc_list = []
     val_acc_list = []
+    acc_by_class = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average='None').to(device)
     train_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average='macro').to(device)
     val_acc = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average='macro').to(device)
     for epoch in range(epochs):
@@ -55,10 +56,15 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
             outputs = model(features)
             _, preds = torch.max(outputs, 1)
             batch_val_acc = val_acc(preds, labels)
+            # Accuracy by class 
+            acc_by_class(preds, labels)
         
         total_val_acc = val_acc.compute()
         val_acc_list.append(total_val_acc)
         print(f'Validation accuracy:{total_val_acc}')
+        # Accuracy by class
+        acc_by_class.compute()
+        print(f'Accuracy by class: {acc_by_class.compute()}')
 
         if total_val_acc > best_val_acc:
             best_val_acc = val_acc
