@@ -107,7 +107,7 @@ if __name__ == "__main__":
     model = VGG(num_channels, num_classes).to(device)
     print(model)
     summary(model, train_dataloader.dataset[0][0].shape)
-    optimizer = torch.optim.Adam(model.parameters(), lr=config['training']['lr'])
+    optimizer = torch.optim.Adam(model.parameters(), lr=float(config['training']['lr']))
     writer = SummaryWriter()
 
     if not os.path.exists('weights'):
