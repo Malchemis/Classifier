@@ -18,18 +18,10 @@ from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from torchsummary import summary
 
-def set_seed(seed) -> None:
-    np.random.seed(seed)
-    random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    # When running on the CuDNN backend, two further options must be set
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    # Set a fixed value for the hash seed
-    os.environ["PYTHONHASHSEED"] = str(seed)
-    print(f"Random seed set as {seed}")
-
+def seed_worker(worker_id):
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
 
 def train(num_classes, model, optimizer, scheduler, train_dataloader, val_dataloader, writer, save_path= 'best_model.pt', epochs=10):
     criterion = torch.nn.CrossEntropyLoss()
@@ -159,13 +151,13 @@ if __name__ == "__main__":
     else:
         raise ValueError(f'No partitions found at {config["data"]["partition"]}')
     
-    # Set seed for reproducibility
-    set_seed(config['training']['seed'])
-    
+    g = torch.Generator()
+    g.manual_seed(0)
+
     # Create dataloaders
-    train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
-    val_dataloader = DataLoader(VehicleDataset(partition, config, set='val'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
-    test_dataloader = DataLoader(VehicleDataset(partition, config, set='test'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
+    train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'], worker_init_fn=seed_worker, generator=g)
+    val_dataloader = DataLoader(VehicleDataset(partition, config, set='val'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'], worker_init_fn=seed_worker, generator=g)
+    test_dataloader = DataLoader(VehicleDataset(partition, config, set='test'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'], worker_init_fn=seed_worker, generator=g)
     
     # Create model
     num_channels = 1
