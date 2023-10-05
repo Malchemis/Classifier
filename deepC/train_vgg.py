@@ -64,8 +64,6 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
             best_val_acc = val_acc
             torch.save(model.state_dict(), os.path.join(save_path))
 
-        print(type(train_acc_list))
-
     return train_acc_list, val_acc_list
 
 def test(config, model, test_dataloader):
