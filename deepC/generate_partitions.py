@@ -226,7 +226,7 @@ if __name__ == "__main__":
     if config['data']['dataset'] == 'vehicle':
         train, val, test = generate_split(labels, config, generate_test=True)
     elif config['data']['dataset'] == 'IDMT':
-        train, val, _ = generate_split(labels, config, split_size= [0.8, 0.2], generate_test=False)
+        train, val, _ = generate_split(labels, config, split_size= [0.9, 0.1], generate_test=False)
         # Load the test csv file
         test = pd.read_csv(config['data']['test_annotations_path'], sep='\t')
     
