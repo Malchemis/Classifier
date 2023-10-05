@@ -43,11 +43,9 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
             optimizer.step()
             train_data.set_description(f'training loss: {mean(running_loss)}')
         # Training accuracy of the epoch
-        total_train_acc = train_acc.compute()
+        total_train_acc = train_acc.compute().cpu().data.numpy()
         writer.add_scalar('training loss', mean(running_loss), epochs)
         print(f'Training accuracy:{total_train_acc}')
-        print(f'Type of total_train_acc:{type(total_train_acc.cpu().data.numpy())}')
-        print(total_train_acc.cpu().data.numpy())
         train_acc_list.append(total_train_acc)
 
 
@@ -65,6 +63,8 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
         if total_val_acc > best_val_acc:
             best_val_acc = val_acc
             torch.save(model.state_dict(), os.path.join(save_path))
+
+        print(type(train_acc_list))
 
     return train_acc_list, val_acc_list
 
@@ -129,10 +129,6 @@ if __name__ == "__main__":
     if not args.only_test:
 
         train_acc, val_acc = train(config, model, optimizer, train_dataloader, val_dataloader, writer, save_path=path_weights, epochs=config['training']['epochs'])
-
-        # Convert to numpy arrays
-        train_acc = train_acc.cpu().data.numpy()
-        val_acc = val_acc.cpu().data.numpy()
 
         # Plot the training and validation accuracy and save it 
         plt.plot(train_acc, color='b', label='Training accuracy')
