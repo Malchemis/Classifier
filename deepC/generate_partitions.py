@@ -49,6 +49,7 @@ def remove_small_classes(labels, config, min_perc=0.01):
     class_to_remove = perc_per_class[perc_per_class['percentage']<0.01][config['data']['header'][1]].values
     # Drop the rows where the class is the one to remove
     for class_value in class_to_remove: 
+        print(f'Dropping class {class_value}')
         labels.drop(labels[labels[config['data']['header'][1]] == class_value].index, inplace=True)
 
     labels.reset_index(drop=True, inplace=True)
