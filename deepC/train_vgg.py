@@ -17,17 +17,17 @@ from torch.utils.data import DataLoader
 from torchsummary import summary
 
 
-def train(config, model, optimizer, train_dataloader, val_dataloader, writer, save_path= 'best_model.pt', epochs=10):
+def train(num_classes, model, optimizer, train_dataloader, val_dataloader, writer, save_path= 'best_model.pt', epochs=10):
     criterion = torch.nn.CrossEntropyLoss()
     best_val_acc = 0
     train_acc_macro_list = []
     val_acc_macro_list = []
     train_acc_micro_list = []
     val_acc_micro_list = []
-    train_acc_macro = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average='macro').to(device)
-    val_acc_macro = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average='macro').to(device)
-    train_acc_micro = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average='micro').to(device)
-    val_acc_micro = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average='micro').to(device)
+    train_acc_macro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='macro').to(device)
+    val_acc_macro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='macro').to(device)
+    train_acc_micro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='micro').to(device)
+    val_acc_micro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='micro').to(device)
     for epoch in range(epochs):
         print(f'Epoch {epoch}/{epochs} :')
         running_loss = []
@@ -77,13 +77,13 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
 
     return train_acc_macro_list, train_acc_micro_list, val_acc_macro_list, val_acc_micro_list
 
-def test(config, model, test_dataloader):
-    acc_by_class = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average=None).to(device)
-    test_acc_macro = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average='macro').to(device)
-    test_acc_micro = torchmetrics.Accuracy(task='multiclass', num_classes=len(config['data']['classes']), average='micro').to(device)
-    f1_by_class = torchmetrics.F1Score(task='multiclass', num_classes=len(config['data']['classes']), average=None).to(device)
-    f1_score_macro = torchmetrics.F1Score(task='multiclass', num_classes=len(config['data']['classes']), average='macro').to(device)
-    f1_score_micro = torchmetrics.F1Score(task='multiclass', num_classes=len(config['data']['classes']), average='micro').to(device)
+def test(num_classes, model, test_dataloader):
+    acc_by_class = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average=None).to(device)
+    test_acc_macro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='macro').to(device)
+    test_acc_micro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='micro').to(device)
+    f1_by_class = torchmetrics.F1Score(task='multiclass', num_classes=num_classes, average=None).to(device)
+    f1_score_macro = torchmetrics.F1Score(task='multiclass', num_classes=num_classes, average='macro').to(device)
+    f1_score_micro = torchmetrics.F1Score(task='multiclass', num_classes=num_classes, average='micro').to(device)
     with torch.no_grad():
         for features, labels in test_dataloader:
             features, labels = features.to(device), labels.to(device)
@@ -111,7 +111,7 @@ def test(config, model, test_dataloader):
         print(f'Accuracy by class:{total_acc_by_class}')
         print(f'F1 score by class:{total_f1_by_class}')
 
-    return total_test_acc_macro, total_test_acc_micro, total_f1_score_macro, total_f1_score_micro, total_acc_by_class, total_f1_by_class
+    #return total_test_acc_macro, total_test_acc_micro, total_f1_score_macro, total_f1_score_micro, total_acc_by_class, total_f1_by_class
 
 if __name__ == "__main__": 
 
@@ -156,7 +156,7 @@ if __name__ == "__main__":
     # Train the model
     if not args.only_test:
 
-        train_acc_macro, train_acc_micro, val_acc_macro, val_acc_micro = train(config, 
+        train_acc_macro, train_acc_micro, val_acc_macro, val_acc_micro = train(num_classes, 
                                                                                model, 
                                                                                optimizer, 
                                                                                train_dataloader, 
@@ -180,7 +180,13 @@ if __name__ == "__main__":
 
     # Load the best model and test it
     model.load_state_dict(torch.load(path_weights))
-    test_acc_macro, test_acc_micro, test_f1_macro, test_f1_micro, acc_by_class, f1_by_class = test(config, 
-                                                                                                   model, 
-                                                                                                   test_dataloader
-                                                                                                   )
+    # test_acc_macro, test_acc_micro, test_f1_macro, test_f1_micro, test_acc_by_class, test_f1_by_class = test(num_classes,
+    #                                                                                                          model, 
+    #                                                                                                          test_dataloader
+    #                                                                                                          )
+    # Get the statistics of the best model on training set 
+    test(num_classes, model, train_dataloader)
+    # Get the statistics of the best model on validation set
+    test(num_classes, model, val_dataloader)
+    # Get the statistics of the best model on test set
+    test(num_classes, model, test_dataloader)
