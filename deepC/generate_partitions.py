@@ -46,11 +46,11 @@ def generate_split(labels, config, split_size= [0.7, 0.1, 0.2], generate_test=Tr
 
     if generate_test: 
         # Split the dataset into train and test
-        train, test = train_test_split(labels, test_size=split_size[2], random_state=config['training']['seed'])
+        train, test = train_test_split(labels, test_size=split_size[2], random_state=config['training']['seed'], stratify=labels[config['data']['header'][1]])
         # Split the train dataset into train and validation
-        train, val = train_test_split(train, test_size=0.1, random_state=config['training']['seed'])
+        train, val = train_test_split(train, test_size=0.1, random_state=config['training']['seed'], stratify=train[config['data']['header'][1]])
     else: 
-        train, val = train_test_split(labels, test_size=split_size[1], random_state=config['training']['seed'])
+        train, val = train_test_split(labels, test_size=split_size[1], random_state=config['training']['seed'], stratify=labels[config['data']['header'][1]])
         test = pd.DataFrame()
 
     train.reset_index(drop=True, inplace=True)
