@@ -27,7 +27,7 @@ feats:
 training:
   batch_size: 8
   lr: 1e-05
-  epochs: 50
+  epochs: 70
   num_workers: 4
   seed: 42
   n_frames: 1876
