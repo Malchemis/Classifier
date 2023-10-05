@@ -5,6 +5,8 @@ import pickle
 from tqdm import tqdm
 
 from statistics import mean
+import random
+import numpy as np
 import matplotlib.pyplot as plt
 
 from dataset import VehicleDataset
@@ -15,6 +17,18 @@ import torchmetrics
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from torchsummary import summary
+
+def set_seed(seed) -> None:
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    # When running on the CuDNN backend, two further options must be set
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    # Set a fixed value for the hash seed
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    print(f"Random seed set as {seed}")
 
 
 def train(num_classes, model, optimizer, train_dataloader, val_dataloader, writer, save_path= 'best_model.pt', epochs=10):
@@ -136,6 +150,9 @@ if __name__ == "__main__":
         print(f'Loaded partitions from {config["data"]["partition"]}')
     else:
         raise ValueError(f'No partitions found at {config["data"]["partition"]}')
+    
+    # Set seed for reproducibility
+    set_seed(config['training']['seed'])
     
     # Create dataloaders
     train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
