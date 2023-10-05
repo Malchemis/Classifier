@@ -187,8 +187,8 @@ if __name__ == "__main__":
     #                                                                                                          test_dataloader
     #                                                                                                          )
     # Get the statistics of the best model on training set 
-    test(num_classes, model, train_dataloader)
+    test(num_classes, model, train_dataloader, set='train')
     # Get the statistics of the best model on validation set
-    test(num_classes, model, val_dataloader)
+    test(num_classes, model, val_dataloader, set='val')
     # Get the statistics of the best model on test set
     test(num_classes, model, test_dataloader)
