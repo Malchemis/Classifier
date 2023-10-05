@@ -9,7 +9,6 @@ data:
   - 2
   - 5
   - 12
-  - 15
   header:
   - filepath_wav_30
   - vehicle_class
