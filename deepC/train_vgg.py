@@ -128,6 +128,10 @@ if __name__ == "__main__":
 
         train_acc, val_acc = train(config, model, optimizer, train_dataloader, val_dataloader, writer, save_path=path_weights, epochs=config['training']['epochs'])
 
+        # Convert to numpy arrays
+        train_acc = train_acc.cpu().data.numpy()
+        val_acc = val_acc.cpu().data.numpy()
+
         # Plot the training and validation accuracy and save it 
         plt.plot(train_acc, color='b', label='Training accuracy')
         plt.plot(val_acc, color='r', label='Validation accuracy')
