@@ -60,7 +60,9 @@ def modify_classes_in_yaml(labels, config):
     """Modify the classes in the config file."""
     with open(config, 'r') as f:
         config_yaml = yaml.safe_load(f)
-        config_yaml['data']['classes'] = labels[config_yaml['data']['header'][1]].unique().sort()
+        new_classes = labels[config['data']['header'][1]].unique().tolist()
+        new_classes.sort()
+        config_yaml['data']['classes'] = new_classes
     with open(config, 'w') as f:
         yaml.dump(config_yaml, f, sort_keys=False)
     
