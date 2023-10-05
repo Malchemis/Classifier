@@ -203,6 +203,7 @@ if __name__ == "__main__":
     #                                                                                                          model, 
     #                                                                                                          test_dataloader
     #                                                                                                          )
+    print('\n')
     # Get the statistics of the best model on training set 
     test(num_classes, model, train_dataloader, set='train')
     # Get the statistics of the best model on validation set
