@@ -55,6 +55,14 @@ def remove_small_classes(labels, config, min_perc=0.01):
     labels.reset_index(drop=True, inplace=True)
 
     return labels
+
+def modify_classes_in_yaml(labels, config):
+    """Modify the classes in the config file."""
+    with open(config, 'r') as f:
+        config_yaml = yaml.safe_load(f)
+        config_yaml['data']['classes'] = labels[config['data']['header'][1]].unique().tolist()
+    with open(config, 'w') as f:
+        yaml.dump(config_yaml, f, sort_keys=False)
     
 def generate_split(labels, config, split_size= [0.7, 0.1, 0.2], generate_test=True):
     """
@@ -249,6 +257,8 @@ if __name__ == "__main__":
 
     # Remove the classes that represent less than 1% of the data
     labels = remove_small_classes(labels, config)
+    # Modify the classes in the config file
+    modify_classes_in_yaml(labels, args.config)
 
     # Generate the splits
     if config['data']['dataset'] == 'vehicle':

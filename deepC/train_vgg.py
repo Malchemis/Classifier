@@ -31,7 +31,7 @@ def set_seed(seed) -> None:
     print(f"Random seed set as {seed}")
 
 
-def train(num_classes, model, optimizer, train_dataloader, val_dataloader, writer, save_path= 'best_model.pt', epochs=10):
+def train(num_classes, model, optimizer, scheduler, train_dataloader, val_dataloader, writer, save_path= 'best_model.pt', epochs=10):
     criterion = torch.nn.CrossEntropyLoss()
     best_val_acc = 0
     train_acc_macro_list = []
@@ -48,6 +48,9 @@ def train(num_classes, model, optimizer, train_dataloader, val_dataloader, write
         train_data = tqdm(train_dataloader)
         for features, labels in train_data:
             features, labels = features.to(device), labels.to(device)
+            # Normalize the inputs
+            features_mu,features_std = torch.mean(features),torch.std(features) 
+            features = (features - features_mu) / features_std
             # Forward pass
             outputs = model(features)
             _, preds = torch.max(outputs, 1)
@@ -60,6 +63,7 @@ def train(num_classes, model, optimizer, train_dataloader, val_dataloader, write
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            scheduler.step()
             train_data.set_description(f'training loss: {mean(running_loss)}')
         # Training accuracy of the epoch
         writer.add_scalar('training loss', mean(running_loss), epochs)
@@ -91,7 +95,7 @@ def train(num_classes, model, optimizer, train_dataloader, val_dataloader, write
 
     return train_acc_macro_list, train_acc_micro_list, val_acc_macro_list, val_acc_micro_list
 
-def test(num_classes, model, dataloader, set='test'):
+def test(num_classes, model, dataloader, class_weights, set='test'):
     acc_by_class = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average=None).to(device)
     test_acc_macro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='macro').to(device)
     test_acc_micro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='micro').to(device)
@@ -101,6 +105,10 @@ def test(num_classes, model, dataloader, set='test'):
     with torch.no_grad():
         for features, labels in dataloader:
             features, labels = features.to(device), labels.to(device)
+            # Normalize the inputs
+            features_mu,features_std = torch.mean(features), torch.std(features)
+            features = (features - features_mu) / features_std
+            # Forward pass
             outputs = model(features)
             _, preds = torch.max(outputs, 1)
             # Metrics
@@ -166,6 +174,12 @@ if __name__ == "__main__":
     print(model)
     summary(model, train_dataloader.dataset[0][0].shape)
     optimizer = torch.optim.Adam(model.parameters(), lr=float(config['training']['lr']))
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, 
+                                                    max_lr=float(config['training']['lr']),
+                                                    steps_per_epoch=int(len(train_dataloader)),
+                                                    epochs=config['training']['epochs'],
+                                                    anneal_strategy='linear'
+                                                    )
     writer = SummaryWriter()
 
     if not os.path.exists('weights'):
@@ -178,6 +192,7 @@ if __name__ == "__main__":
         train_acc_macro, train_acc_micro, val_acc_macro, val_acc_micro = train(num_classes, 
                                                                                model, 
                                                                                optimizer, 
+                                                                               scheduler,
                                                                                train_dataloader, 
                                                                                val_dataloader, 
                                                                                writer, 
@@ -191,6 +206,9 @@ if __name__ == "__main__":
         plt.plot(val_acc_macro, color='r', label='Validation accuracy macro')
         plt.plot(val_acc_micro, color='y', label='Validation accuracy micro')
         plt.legend()
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.title(f"Training and validation accuracy - {config['data']['dataset']} dataset")
         plt.show()
         if not os.path.exists('plots'):
             os.makedirs('plots')
