@@ -95,7 +95,7 @@ def train(num_classes, model, optimizer, scheduler, train_dataloader, val_datalo
 
     return train_acc_macro_list, train_acc_micro_list, val_acc_macro_list, val_acc_micro_list
 
-def test(num_classes, model, dataloader, class_weights, set='test'):
+def test(num_classes, model, dataloader, set='test'):
     acc_by_class = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average=None).to(device)
     test_acc_macro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='macro').to(device)
     test_acc_micro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='micro').to(device)
