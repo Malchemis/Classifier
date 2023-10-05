@@ -77,7 +77,7 @@ def train(num_classes, model, optimizer, train_dataloader, val_dataloader, write
 
     return train_acc_macro_list, train_acc_micro_list, val_acc_macro_list, val_acc_micro_list
 
-def test(num_classes, model, test_dataloader):
+def test(num_classes, model, dataloader, set='test'):
     acc_by_class = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average=None).to(device)
     test_acc_macro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='macro').to(device)
     test_acc_micro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='micro').to(device)
@@ -85,7 +85,7 @@ def test(num_classes, model, test_dataloader):
     f1_score_macro = torchmetrics.F1Score(task='multiclass', num_classes=num_classes, average='macro').to(device)
     f1_score_micro = torchmetrics.F1Score(task='multiclass', num_classes=num_classes, average='micro').to(device)
     with torch.no_grad():
-        for features, labels in test_dataloader:
+        for features, labels in dataloader:
             features, labels = features.to(device), labels.to(device)
             outputs = model(features)
             _, preds = torch.max(outputs, 1)
@@ -104,12 +104,14 @@ def test(num_classes, model, test_dataloader):
         total_f1_score_micro = f1_score_micro.compute().cpu().data.numpy()
         total_acc_by_class = acc_by_class.compute().cpu().data.numpy() 
         total_f1_by_class = f1_by_class.compute().cpu().data.numpy()
-        print(f'Test accuracy macro:{total_test_acc_macro}')
-        print(f'Test accuracy micro:{total_test_acc_micro}')
-        print(f'Test F1 score macro:{total_f1_score_macro}')
-        print(f'Test F1 score micro:{total_f1_score_micro}')
+        print(f'Statistics on {set} set:')
+        print(f'Accuracy macro:{total_test_acc_macro}')
+        print(f'Accuracy micro:{total_test_acc_micro}')
+        print(f'F1 score macro:{total_f1_score_macro}')
+        print(f'F1 score micro:{total_f1_score_micro}')
         print(f'Accuracy by class:{total_acc_by_class}')
         print(f'F1 score by class:{total_f1_by_class}')
+        print('\n')
 
     #return total_test_acc_macro, total_test_acc_micro, total_f1_score_macro, total_f1_score_micro, total_acc_by_class, total_f1_by_class
 
