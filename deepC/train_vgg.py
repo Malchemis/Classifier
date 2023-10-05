@@ -46,7 +46,8 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
         total_train_acc = train_acc.compute()
         writer.add_scalar('training loss', mean(running_loss), epochs)
         print(f'Training accuracy:{total_train_acc}')
-        print(f'Type of total_train_acc:{type(total_train_acc.cpu().data.float())}')
+        print(f'Type of total_train_acc:{type(total_train_acc.cpu().data.numpy()[0])}')
+        print(total_train_acc.cpu().data.numpy()[0])
         train_acc_list.append(total_train_acc)
 
 
