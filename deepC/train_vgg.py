@@ -151,19 +151,21 @@ if __name__ == "__main__":
     else:
         raise ValueError(f'No partitions found at {config["data"]["partition"]}')
     
-    g = torch.Generator()
-    g.manual_seed(0)
+    # g = torch.Generator()
+    # g.manual_seed(0)
 
     # Create dataloaders
-    train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'], worker_init_fn=seed_worker, generator=g)
-    val_dataloader = DataLoader(VehicleDataset(partition, config, set='val'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'], worker_init_fn=seed_worker, generator=g)
-    test_dataloader = DataLoader(VehicleDataset(partition, config, set='test'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'], worker_init_fn=seed_worker, generator=g)
+    train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
+    val_dataloader = DataLoader(VehicleDataset(partition, config, set='val'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
+    test_dataloader = DataLoader(VehicleDataset(partition, config, set='test'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
+    # train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'], worker_init_fn=seed_worker, generator=g)
+    # val_dataloader = DataLoader(VehicleDataset(partition, config, set='val'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'], worker_init_fn=seed_worker, generator=g)
+    # test_dataloader = DataLoader(VehicleDataset(partition, config, set='test'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'], worker_init_fn=seed_worker, generator=g)
     
     # Create model
     num_channels = 1
     num_classes = len(config['data']['classes'])
     model = VGG(num_channels, num_classes).to(device)
-    print(model)
     summary(model, train_dataloader.dataset[0][0].shape)
     optimizer = torch.optim.Adam(model.parameters(), lr=float(config['training']['lr']))
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, 
