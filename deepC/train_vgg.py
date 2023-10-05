@@ -56,7 +56,7 @@ def train(config, model, optimizer, train_dataloader, val_dataloader, writer, sa
             _, preds = torch.max(outputs, 1)
             batch_val_acc = val_acc(preds, labels)
         
-        total_val_acc = val_acc.compute()
+        total_val_acc = val_acc.compute().cpu().data.numpy()
         val_acc_list.append(total_val_acc)
         print(f'Validation accuracy:{total_val_acc}')
 
@@ -83,7 +83,7 @@ def test(config, model, test_dataloader):
             # Metrics by class 
             acc_by_class(preds, labels)
             f1_by_class(preds, labels)
-    return test_acc.compute(), f1_score.compute(), acc_by_class.compute(), f1_by_class.compute()
+    return test_acc.compute().cpu().data.numpy(), f1_score.compute().cpu().data.numpy(), acc_by_class.compute().cpu().data.numpy(), f1_by_class.compute().cpu().data.numpy()
 
 if __name__ == "__main__": 
 
