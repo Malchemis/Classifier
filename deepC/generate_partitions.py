@@ -31,6 +31,30 @@ def verifiy_data(labels, config):
         print('Classes in classes variable: {}'.format(config['data']['classes']))
         raise ValueError('The classes are not the same as the ones in the annotations file.')
     
+def remove_small_classes(labels, config, min_perc=0.01):
+    """
+    Remove the classes that represent less than 1% of the data.
+    
+    Args:
+        labels (pandas dataframe): The dataframe containing the annotations.
+        min_perc (float): The minimum percentage of a class to be kept. The default is 0.01 = 1%.
+    """
+    nb_data = len(labels)
+
+    # Get the percentage of occurence of each class
+    perc_per_class = labels.groupby(config['data']['header'][1]).size().reset_index(name='percentage')
+    perc_per_class['percentage'] = perc_per_class['percentage'].apply(lambda x: x/nb_data)
+
+    # Get the classes which represent less than 1% of the data
+    class_to_remove = perc_per_class[perc_per_class['percentage']<0.01][config['data']['header'][1]].values
+    # Drop the rows where the class is the one to remove
+    for class_value in class_to_remove: 
+        labels.drop(labels[labels[config['data']['header'][1]] == class_value].index, inplace=True)
+
+    labels.reset_index(drop=True, inplace=True)
+
+    return labels
+    
 def generate_split(labels, config, split_size= [0.7, 0.1, 0.2], generate_test=True):
     """
     Generate the train, validation and test splits.
@@ -221,6 +245,9 @@ if __name__ == "__main__":
 
     # Verify the data
     verifiy_data(labels, config)
+
+    # Remove the classes that represent less than 1% of the data
+    labels = remove_small_classes(labels, config)
 
     # Generate the splits
     if config['data']['dataset'] == 'vehicle':
