@@ -25,7 +25,7 @@ def seed_worker(worker_id):
 
 def train(num_classes, model, optimizer, scheduler, train_dataloader, val_dataloader, writer, save_path= 'best_model.pt', epochs=10):
     criterion = torch.nn.CrossEntropyLoss()
-    best_val_acc = 0
+    best_val_acc_macro = 0
     train_acc_macro_list = []
     val_acc_macro_list = []
     train_acc_micro_list = []
@@ -81,13 +81,22 @@ def train(num_classes, model, optimizer, scheduler, train_dataloader, val_datalo
         print(f'Validation accuracy micro:{total_val_acc_micro}')
         val_acc_micro_list.append(total_val_acc_micro)
 
-        if total_val_acc_macro > best_val_acc:
-            best_val_acc = total_val_acc_macro
+        if total_val_acc_macro > best_val_acc_macro:
+            best_val_acc_macro = total_val_acc_macro
+            best_train_acc_macro = total_train_acc_macro
+            best_train_acc_micro = total_train_acc_micro
+            best_val_acc_micro = total_val_acc_micro
             torch.save(model.state_dict(), os.path.join(save_path))
+
+    print('--------------------------------------------------')
+    print(f'Best training accuracy macro:{best_train_acc_macro}')
+    print(f'Best training accuracy micro:{best_train_acc_micro}')
+    print(f'Best validation accuracy macro:{best_val_acc_macro}')
+    print(f'Best validation accuracy micro:{best_val_acc_micro}')
 
     return train_acc_macro_list, train_acc_micro_list, val_acc_macro_list, val_acc_micro_list
 
-def test(num_classes, model, dataloader, set='test'):
+def test(num_classes, model, dataloader):
     acc_by_class = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average=None).to(device)
     test_acc_macro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='macro').to(device)
     test_acc_micro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='micro').to(device)
@@ -118,7 +127,8 @@ def test(num_classes, model, dataloader, set='test'):
         total_f1_score_micro = f1_score_micro.compute().cpu().data.numpy()
         total_acc_by_class = acc_by_class.compute().cpu().data.numpy() 
         total_f1_by_class = f1_by_class.compute().cpu().data.numpy()
-        print(f'Statistics on {set} set:')
+        print('--------------------------------------------------')
+        print(f'Statistics on test set:')
         print(f'Accuracy macro:{total_test_acc_macro}')
         print(f'Accuracy micro:{total_test_acc_micro}')
         print(f'F1 score macro:{total_f1_score_macro}')
@@ -126,8 +136,6 @@ def test(num_classes, model, dataloader, set='test'):
         print(f'Accuracy by class:{total_acc_by_class}')
         print(f'F1 score by class:{total_f1_by_class}')
         print('\n')
-
-    #return total_test_acc_macro, total_test_acc_micro, total_f1_score_macro, total_f1_score_micro, total_acc_by_class, total_f1_by_class
 
 if __name__ == "__main__": 
 
@@ -183,18 +191,18 @@ if __name__ == "__main__":
     # Train the model
     if not args.only_test:
 
-        train_acc_macro, train_acc_micro, val_acc_macro, val_acc_micro = train(num_classes, 
-                                                                               model, 
-                                                                               optimizer, 
+        train_acc_macro, train_acc_micro, val_acc_macro, val_acc_micro = train(num_classes,
+                                                                               model,
+                                                                               optimizer,
                                                                                scheduler,
-                                                                               train_dataloader, 
-                                                                               val_dataloader, 
-                                                                               writer, 
-                                                                               save_path=path_weights, 
+                                                                               train_dataloader,
+                                                                               val_dataloader,
+                                                                               writer,
+                                                                               save_path=path_weights,
                                                                                epochs=config['training']['epochs']
                                                                                )
 
-        # Plot the training and validation accuracy and save it 
+# Plot the training and validation accuracy and save it 
         plt.plot(train_acc_macro, color='b', label='Training accuracy macro')
         plt.plot(train_acc_micro, color='g', label='Training accuracy micro')
         plt.plot(val_acc_macro, color='r', label='Validation accuracy macro')
@@ -211,14 +219,6 @@ if __name__ == "__main__":
 
     # Load the best model and test it
     model.load_state_dict(torch.load(path_weights))
-    # test_acc_macro, test_acc_micro, test_f1_macro, test_f1_micro, test_acc_by_class, test_f1_by_class = test(num_classes,
-    #                                                                                                          model, 
-    #                                                                                                          test_dataloader
-    #                                                                                                          )
-    print('\n')
-    # Get the statistics of the best model on training set 
-    test(num_classes, model, train_dataloader, set='train')
-    # Get the statistics of the best model on validation set
-    test(num_classes, model, val_dataloader, set='val')
+    
     # Get the statistics of the best model on test set
     test(num_classes, model, test_dataloader)
