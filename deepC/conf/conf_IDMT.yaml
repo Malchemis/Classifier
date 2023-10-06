@@ -3,6 +3,7 @@ data:
   data_dir: ../../IDMT_Traffic
   annotations_path: ../../IDMT_Traffic/annotation/vehicle_train.csv
   test_annotations_path: ../../IDMT_Traffic/annotation/vehicle_test.csv
+  npy_path: ../../IDMT_Traffic/npy
   partition: ../../IDMT_Traffic/partitions.pkl
   classes:
   - C

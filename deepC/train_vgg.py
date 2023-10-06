@@ -202,7 +202,7 @@ if __name__ == "__main__":
                                                                                epochs=config['training']['epochs']
                                                                                )
 
-# Plot the training and validation accuracy and save it 
+        # Plot the training and validation accuracy and save it 
         plt.plot(train_acc_macro, color='b', label='Training accuracy macro')
         plt.plot(train_acc_micro, color='g', label='Training accuracy micro')
         plt.plot(val_acc_macro, color='r', label='Validation accuracy macro')

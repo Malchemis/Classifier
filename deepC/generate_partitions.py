@@ -46,15 +46,16 @@ def remove_small_classes(labels, config, min_perc=0.01):
     perc_per_class['percentage'] = perc_per_class['percentage'].apply(lambda x: x/nb_data)
 
     # Get the classes which represent less than 1% of the data
-    class_to_remove = perc_per_class[perc_per_class['percentage']<0.01][config['data']['header'][1]].values
+    class_to_remove = perc_per_class[perc_per_class['percentage'] < min_perc][config['data']['header'][1]].values
     # Drop the rows where the class is the one to remove
-    for class_value in class_to_remove: 
-        print(f'Dropping class {class_value}')
-        labels.drop(labels[labels[config['data']['header'][1]] == class_value].index, inplace=True)
+    if len(class_to_remove) > 0:
+        for class_value in class_to_remove: 
+            print(f'Dropping class {class_value}')
+            labels.drop(labels[labels[config['data']['header'][1]] == class_value].index, inplace=True)
 
     labels.reset_index(drop=True, inplace=True)
 
-    return labels
+    return labels, class_to_remove
 
 def modify_classes_in_yaml(labels, config):
     """Modify the classes in the config file."""
@@ -215,21 +216,21 @@ def get_log_melspectrogram_set(set, save_path, config):
         np.save(f"{save_path}/{filename.split('/')[-1].replace('.wav', '')}.npy", log_melspectrogram.numpy())
 
 def compute_all_log_melspectrogram(partitions, config): 
-    if not os.path.exists(os.path.join(config['data']['data_dir'], 'npy', 'train')):
+    if not os.path.exists(os.path.join(config['data']['npy_path'], 'train')):
         print("Constructing mel audio for train set")
-        get_log_melspectrogram_set(partitions['train'], os.path.join(config['data']['data_dir'], 'npy', 'train'), config)
-    if not os.path.exists(os.path.join(config['data']['data_dir'], 'npy', 'val')):    
+        get_log_melspectrogram_set(partitions['train'], os.path.join(config['data']['npy_path'], 'train'), config)
+    if not os.path.exists(os.path.join(config['data']['npy_path'], 'val')):    
         print("Constructing mel audio for val set")
-        get_log_melspectrogram_set(partitions['val'], os.path.join(config['data']['data_dir'], 'npy', 'val'), config)
-    if not os.path.exists(os.path.join(config['data']['data_dir'], 'npy', 'test')):
+        get_log_melspectrogram_set(partitions['val'], os.path.join(config['data']['npy_path'], 'val'), config)
+    if not os.path.exists(os.path.join(config['data']['npy_path'], 'test')):
         print("Constructing mel audio for test set")
-        get_log_melspectrogram_set(partitions['test'], os.path.join(config['data']['data_dir'], 'npy', 'test'), config)
+        get_log_melspectrogram_set(partitions['test'], os.path.join(config['data']['npy_path'], 'test'), config)
 
 def find_n_frames(partitions, config):
     """Find the number of frames in the dataset."""
     n_frames = []
     for i, (filename, _) in enumerate(partitions['train']):
-        log_melspectrogram = np.load(os.path.join(config['data']['data_dir'], 'npy', 'train', filename.split('/')[-1].replace('.wav', '') + '.npy'))
+        log_melspectrogram = np.load(os.path.join(config['data']['npy_path'], 'train', filename.split('/')[-1].replace('.wav', '') + '.npy'))
         n_frames.append(log_melspectrogram.shape[2])
     return min(n_frames)
 
@@ -258,9 +259,10 @@ if __name__ == "__main__":
     verifiy_data(labels, config)
 
     # Remove the classes that represent less than 1% of the data
-    labels = remove_small_classes(labels, config)
+    labels, class_to_remove = remove_small_classes(labels, config)
     # Modify the classes in the config file
-    modify_classes_in_yaml(labels, args.config)
+    if len(class_to_remove) > 0:
+        modify_classes_in_yaml(labels, args.config)
 
     # Generate the splits
     if config['data']['dataset'] == 'vehicle':
@@ -277,5 +279,5 @@ if __name__ == "__main__":
     compute_all_log_melspectrogram(partitions, config)
 
     # Find the number of frames in the dataset and add it to the config file
-    n_frames = find_n_frames(partitions, config)
+    n_frames = find_n_frames(partitions)
     add_n_frames_in_yaml(n_frames, args.config)

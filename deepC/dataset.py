@@ -13,13 +13,14 @@ class VehicleDataset(Dataset):
         self.data_dir = config['data']['data_dir']
         self.set = set
         self.n_frames = config['training']['n_frames']
+        self.npy_path = config['data']['npy_path']
     
     def __len__(self):
         return len(self.partition)
     
     def __getitem__(self, idx):
         filename, class_value = self.partition[idx]
-        log_melspectrogram = np.load(os.path.join(self.data_dir, 'npy', self.set, filename.split('/')[-1].replace('.wav', '') + '.npy'))[:, :, :self.n_frames]
+        log_melspectrogram = np.load(os.path.join(self.npy_path, self.set, filename.split('/')[-1].replace('.wav', '') + '.npy'))[:, :, :self.n_frames]
         return log_melspectrogram, class_value
     
 if __name__ == "__main__": 
