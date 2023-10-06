@@ -27,7 +27,7 @@ feats:
   f_min: 0
   f_max: 8000
 training:
-  batch_size: 12
+  batch_size: 8
   lr: 1e-05
   epochs: 70
   num_workers: 4
