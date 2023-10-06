@@ -2,6 +2,7 @@ import argparse
 import yaml
 import os 
 import pickle
+import time
 
 import random
 import numpy as np
@@ -276,7 +277,10 @@ if __name__ == "__main__":
     partitions = generate_partitions(train, val, test, config)
 
     # Compute the log melspectrogram for each set
+    start = time.time()
     compute_all_log_melspectrogram(partitions, config)
+    end = time.time()
+    print(f'Time to compute the log melspectrogram: {end - start} seconds')
 
     # Find the number of frames in the dataset and add it to the config file
     n_frames = find_n_frames(partitions, config)
