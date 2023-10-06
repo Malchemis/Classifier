@@ -1,15 +1,16 @@
 data:
   dataset: vehicle
   data_dir: ../../SED-single_vehicle-30_sec
-  annotations_path: ../../SED-single_vehicle-30_sec/weak_labels.csv
+  annotations_path: ../../SED-single_vehicle-30_sec/weak_augmented_and_gained.csv
   test_annotations_path: ../../SED-single_vehicle-30_sec/weak_labels_test.csv
-  npy_path: ../../SED-single_vehicle-30_sec/npy
-  partition: ../../SED-single_vehicle-30_sec/partitions.pkl
+  npy_path: ../../SED-single_vehicle-30_sec/npy_augmented_and_gained
+  partition: ../../SED-single_vehicle-30_sec/partitions_augmented_and_gained.pkl
   classes:
   - 1
   - 2
   - 5
   - 12
+  - 15 
   header:
   - filepath_wav_30
   - vehicle_class
