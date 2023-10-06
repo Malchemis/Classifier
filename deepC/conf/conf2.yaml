@@ -31,4 +31,4 @@ training:
   epochs: 70
   num_workers: 4
   seed: 42
-  n_frames: 1876
+  n_frames: 1412
