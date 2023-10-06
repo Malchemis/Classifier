@@ -194,6 +194,8 @@ def get_log_melspectrogram_set(set, save_path, config):
         # Resample the audio if necessary
         if sr != config['feats']['sample_rate']:
             resampled_audio = Resample(sr, config['feats']['sample_rate'])(audio)
+        else:
+            resampled_audio = audio
         # Pad the audio if necessary
         resampled_audio_pad, *_ = pad_audio(
                                     resampled_audio, 
