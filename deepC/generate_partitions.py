@@ -279,5 +279,5 @@ if __name__ == "__main__":
     compute_all_log_melspectrogram(partitions, config)
 
     # Find the number of frames in the dataset and add it to the config file
-    n_frames = find_n_frames(partitions)
+    n_frames = find_n_frames(partitions, config)
     add_n_frames_in_yaml(n_frames, args.config)
