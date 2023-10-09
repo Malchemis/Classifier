@@ -139,7 +139,7 @@ def generate_partitions(train, val, test, config):
     return partitions
 
 def pad_audio(audio, target_len, fs):
-    
+    """Padding function of DCASE"""
     if audio.shape[-1] < target_len:
         audio = torch.nn.functional.pad(
             audio, (0, target_len - audio.shape[-1]), mode="constant"
@@ -165,18 +165,17 @@ def pad_audio(audio, target_len, fs):
 def get_log_melspectrogram(audio, sample_rate, n_fft, win_length, hop_length, n_mels, f_min, f_max):
     """Compute log melspectrogram of an audio signal."""
     # Compute the mel spectrogram
-    mel_spectrogram = MelSpectrogram(
-        sample_rate=sample_rate,
-        n_fft=n_fft,
-        win_length=win_length,
-        hop_length=hop_length,
-        f_min=f_min,
-        f_max=f_max,
-        n_mels=n_mels,
-        window_fn=torch.hamming_window,
-        wkwargs={"periodic": False},
-        power=1,
-    )(audio)
+    mel_spectrogram = MelSpectrogram(sample_rate=sample_rate,
+                                     n_fft=n_fft,
+                                     win_length=win_length,
+                                     hop_length=hop_length,
+                                     f_min=f_min,
+                                     f_max=f_max,
+                                     n_mels=n_mels,
+                                     window_fn=torch.hamming_window,
+                                     wkwargs={"periodic": False},
+                                     power=1,
+                                     )(audio)
     # Convert to dB
     amp_to_db = AmplitudeToDB(stype="amplitude")
     amp_to_db.amin = 1e-5  # amin= 1e-5 as in librosa
