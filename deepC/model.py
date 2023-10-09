@@ -56,7 +56,7 @@ class VGG(nn.Module):
         layers.append(ConvBlock(input_features=8*base_features, output_features=8*base_features, kernel=3, padding=1, stride=1))
         layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
 
-        layers.append(nn.AdaptiveAvgPool2d(4)) # 2 # Tester 7 comme dans VGG 
+        layers.append(nn.AdaptiveAvgPool2d(2)) # Tester 7 comme dans VGG 
 
         fc_layers.extend([nn.Linear(in_features=2*2*(8*base_features), out_features= base_features*base_features), nn.ReLU(), nn.Dropout(0.5)])
         fc_layers.extend([nn.Linear(in_features=base_features*base_features, out_features= base_features*base_features), nn.ReLU(), nn.Dropout(0.5)])
