@@ -41,14 +41,15 @@ class VGG(nn.Module):
         base_features = 32
 
         layers.append(ConvBlock(input_features=num_channels, output_features=base_features, kernel=3, padding=1, stride=1))
+        #layers.append(ConvBlock(input_features=base_features, output_features=2*base_features, kernel=3, padding=1, stride=1))
+        layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
+
         layers.append(ConvBlock(input_features=base_features, output_features=2*base_features, kernel=3, padding=1, stride=1))
+        #layers.append(ConvBlock(input_features=2*base_features, output_features=2*base_features, kernel=3, padding=1, stride=1))
+        #layers.append(ConvBlock(input_features=2*base_features, output_features=4*base_features, kernel=3, padding=1, stride=1))
         layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
 
-        layers.append(ConvBlock(input_features=2*base_features, output_features=2*base_features, kernel=3, padding=1, stride=1))
         layers.append(ConvBlock(input_features=2*base_features, output_features=4*base_features, kernel=3, padding=1, stride=1))
-        layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
-
-        layers.append(ConvBlock(input_features=4*base_features, output_features=4*base_features, kernel=3, padding=1, stride=1))
         layers.append(ConvBlock(input_features=4*base_features, output_features=8*base_features, kernel=3, padding=1, stride=1))
         layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
 
