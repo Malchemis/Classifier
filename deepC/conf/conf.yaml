@@ -1,24 +1,24 @@
 data:
   dataset: vehicle
-  data_dir: ../../SED-single_vehicle-30_sec
-  annotations_path: ../../SED-single_vehicle-30_sec/weak_augmented_and_gained.csv
-  test_annotations_path: ../../SED-single_vehicle-30_sec/weak_labels_test.csv
-  npy_path: ../../SED-single_vehicle-30_sec/npy_augmented_and_gained
-  partition: ../../SED-single_vehicle-30_sec/partitions_augmented_and_gained.pkl
+  basedir: /media/huimin/Backup_03TB_651/single_vehicle-20sec_gap15sec
+  annotations_path: /media/huimin/Backup_03TB_651/single_vehicle-20sec_gap15sec/strong_and_weak_labels.csv
+  test_annotations_path: null
+  npy_path: /media/huimin/Backup_03TB_651/single_vehicle-20sec_gap15sec/npy
+  partition: /media/huimin/Backup_03TB_651/single_vehicle-20sec_gap15sec/partitions.pkl
   classes:
   - 1
   - 2
   - 5
   - 12
-  - 15 
+  - 15
   header:
-  - filepath_wav_30
+  - filename
+  - onset
+  - offset
   - vehicle_class
-  - vehicle_class_combo
-  - vehicle_class_base
   - speed
 feats:
-  duration: 30
+  duration: 20
   sample_rate: 16000
   n_fft: 2048
   win_length: 2048
@@ -32,4 +32,3 @@ training:
   epochs: 70
   num_workers: 4
   seed: 42
-  n_frames: 1876

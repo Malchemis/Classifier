@@ -39,7 +39,7 @@ def train(num_classes, model, optimizer, scheduler, train_dataloader, val_datalo
         running_loss = []
         train_data = tqdm(train_dataloader)
         for features, labels in train_data:
-            features, labels = features.to(device), labels.to(device)
+            features, labels = features.to(device, non_blocking=True), labels.to(device, non_blocking=True)
             # Normalize the inputs
             features_mu,features_std = torch.mean(features),torch.std(features) 
             features = (features - features_mu) / features_std
@@ -68,7 +68,7 @@ def train(num_classes, model, optimizer, scheduler, train_dataloader, val_datalo
 
         # Validation step 
         for features, labels in val_dataloader:
-            features, labels = features.to(device), labels.to(device)
+            features, labels = features.to(device, non_blocking=True), labels.to(device, non_blocking=True)
             outputs = model(features)
             _, preds = torch.max(outputs, 1)
             val_acc_macro(preds, labels)
@@ -105,7 +105,7 @@ def test(num_classes, model, dataloader):
     f1_score_micro = torchmetrics.F1Score(task='multiclass', num_classes=num_classes, average='micro').to(device)
     with torch.no_grad():
         for features, labels in dataloader:
-            features, labels = features.to(device), labels.to(device)
+            features, labels = features.to(device, non_blocking=True), labels.to(device, non_blocking=True)
             # Normalize the inputs
             features_mu,features_std = torch.mean(features), torch.std(features)
             features = (features - features_mu) / features_std
@@ -163,9 +163,9 @@ if __name__ == "__main__":
     # g.manual_seed(0)
 
     # Create dataloaders
-    train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
-    val_dataloader = DataLoader(VehicleDataset(partition, config, set='val'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
-    test_dataloader = DataLoader(VehicleDataset(partition, config, set='test'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'])
+    train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, pin_memory=True, num_workers=config['training']['num_workers'])
+    val_dataloader = DataLoader(VehicleDataset(partition, config, set='val'), batch_size=config['training']['batch_size'], shuffle=True, pin_memory=True, num_workers=config['training']['num_workers'])
+    test_dataloader = DataLoader(VehicleDataset(partition, config, set='test'), batch_size=config['training']['batch_size'], shuffle=True, pin_memory=True, num_workers=config['training']['num_workers'])
     # train_dataloader = DataLoader(VehicleDataset(partition, config), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'], worker_init_fn=seed_worker, generator=g)
     # val_dataloader = DataLoader(VehicleDataset(partition, config, set='val'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'], worker_init_fn=seed_worker, generator=g)
     # test_dataloader = DataLoader(VehicleDataset(partition, config, set='test'), batch_size=config['training']['batch_size'], shuffle=True, num_workers=config['training']['num_workers'], worker_init_fn=seed_worker, generator=g)
