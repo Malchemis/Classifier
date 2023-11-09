@@ -34,6 +34,7 @@ def train(num_classes, model, optimizer, scheduler, train_dataloader, val_datalo
     val_acc_macro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='macro').to(device)
     train_acc_micro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='micro').to(device)
     val_acc_micro = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes, average='micro').to(device)
+    
     for epoch in range(epochs):
         print(f'Epoch {epoch}/{epochs} :')
         running_loss = []
@@ -186,7 +187,7 @@ if __name__ == "__main__":
 
     if not os.path.exists('weights'):
         os.makedirs('weights')
-    path_weights = os.path.join('weights', config['data']['dataset'] + '_best_model.pt')
+    path_weights = os.path.join('weights', config['data']['dataset'] + '_20s_best_model.pt')
 
     # Train the model
     if not args.only_test:
@@ -214,7 +215,7 @@ if __name__ == "__main__":
         plt.show()
         if not os.path.exists('plots'):
             os.makedirs('plots')
-        plt.savefig(os.path.join('plots', config['data']['dataset'] + '_accuracy.png'))
+        plt.savefig(os.path.join('plots', config['data']['dataset'] + '_20s_accuracy.png'))
         plt.close()
 
     # Load the best model and test it

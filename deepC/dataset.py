@@ -10,7 +10,7 @@ from torch.utils.data import Dataset, DataLoader
 class VehicleDataset(Dataset): 
     def __init__(self, partition, config, set='train'):
         self.partition = partition[set]
-        self.data_dir = config['data']['data_dir']
+        self.basedir = config['data']['basedir']
         self.set = set
         self.n_frames = config['training']['n_frames']
         self.npy_path = config['data']['npy_path']
