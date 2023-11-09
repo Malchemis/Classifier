@@ -3,6 +3,7 @@ import yaml
 import os 
 import pickle
 import time
+from tqdm import tqdm
 
 import random
 import numpy as np
@@ -120,13 +121,13 @@ def generate_partitions(train, val, test, config):
         config (dict): The configuration dictionary.
     """
 
+    datasets = {'train': train, 'val': val, 'test': test}
+    partitions = {}
+
     # Get the partitions
     if not os.path.exists(config['data']['partition']):
-        partitions = {'train': [], 'val': [], 'test': []}
-
-        partitions['train'] = [(filename, class_value) for filename, class_value in zip(train[config['data']['header'][0]], train[config['data']['header'][3]])]
-        partitions['val'] = [(filename, class_value) for filename, class_value in zip(val[config['data']['header'][0]], val[config['data']['header'][3]])]
-        partitions['test'] = [(filename, class_value) for filename, class_value in zip(test[config['data']['header'][0]], test[config['data']['header'][3]])]
+        for key, df in datasets.items():
+            partitions[key] = [(filename, class_value) for filename, class_value in zip(df[config['data']['header'][0]], df[config['data']['header'][3]])]
         
         # Save the partitions
         with open(config['data']['partition'], 'wb') as f:
@@ -183,8 +184,7 @@ def get_log_melspectrogram(audio, sample_rate, n_fft, win_length, hop_length, n_
 
 def get_log_melspectrogram_set(set, save_path, config): 
     """Compute log melspectrogram of a set of audio signals."""
-    for i, (filename, _) in enumerate(set):
-        print(f"\rConstructing mel audio {i+1}/{len(set)}", flush=True)
+    for _, (filename, _) in tqdm(enumerate(set), total=len(set)):
         audio, sr = torchaudio.load(os.path.join(config['data']['basedir'], filename))
         # Convert to mono if necessary
         if audio.shape[0] > 1:
@@ -218,13 +218,13 @@ def get_log_melspectrogram_set(set, save_path, config):
 
 def compute_all_log_melspectrogram(partitions, config): 
     if not os.path.exists(os.path.join(config['data']['npy_path'], 'train')):
-        print("Constructing mel audio for train set")
+        print("Constructing log melspectrograms for train set...")
         get_log_melspectrogram_set(partitions['train'], os.path.join(config['data']['npy_path'], 'train'), config)
     if not os.path.exists(os.path.join(config['data']['npy_path'], 'val')):    
-        print("Constructing mel audio for val set")
+        print("Constructing log melspectrograms for val set...")
         get_log_melspectrogram_set(partitions['val'], os.path.join(config['data']['npy_path'], 'val'), config)
     if not os.path.exists(os.path.join(config['data']['npy_path'], 'test')):
-        print("Constructing mel audio for test set")
+        print("Constructing log melspectrograms for test set...")
         get_log_melspectrogram_set(partitions['test'], os.path.join(config['data']['npy_path'], 'test'), config)
 
 def find_n_frames(partitions, config):
@@ -246,7 +246,7 @@ def add_n_frames_in_yaml(n_frames, config_path):
 if __name__ == "__main__": 
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, default='conf/conf_20sec.yaml', help='Path to config file.')
+    parser.add_argument('--config', type=str, default='conf/conf.yaml', help='Path to config file.')
     args = parser.parse_args()
 
     # Open the config file 
@@ -266,6 +266,7 @@ if __name__ == "__main__":
         modify_classes_in_yaml(class_to_remove, args.config)
 
     # Generate the splits
+    print(f'Generating the splits...')
     if config['data']['dataset'] == 'vehicle':
         train, val, test = generate_split(labels, config, generate_test=True)
     elif config['data']['dataset'] == 'IDMT':
@@ -277,6 +278,7 @@ if __name__ == "__main__":
             raise ValueError('The test annotations file does not exist.')
     
     # Generate the partitions
+    print(f'Generating the partitions...')
     partitions = generate_partitions(train, val, test, config)
 
     # Compute the log melspectrogram for each set
@@ -286,5 +288,7 @@ if __name__ == "__main__":
     print(f'Time to compute the log melspectrogram: {end - start} seconds')
 
     # Find the number of frames in the dataset and add it to the config file
+    print(f'Finding the number of frames in the dataset...')
     n_frames = find_n_frames(partitions, config)
+    print(f'The number of frames in the dataset is {n_frames}')
     add_n_frames_in_yaml(n_frames, args.config)
