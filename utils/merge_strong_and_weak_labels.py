@@ -23,8 +23,6 @@ def merge_strong_and_weak(strong_labels, weak_labels, save_path):
     strong_and_weak = strong_and_weak.drop(columns=['filename_extracted', 'filename_y', 'event_label'])
     # Rename the column 'filename_x' to 'filename'
     strong_and_weak = strong_and_weak.rename(columns={'filename_x': 'filename'})
-    # Rename the column 'vehicle_class' to 'event_label'
-    strong_and_weak = strong_and_weak.rename(columns={'vehicle_class': 'event_label'})
 
     # Save the merged dataframe to a csv file
     strong_and_weak.to_csv(save_path, sep='\t', index=False)

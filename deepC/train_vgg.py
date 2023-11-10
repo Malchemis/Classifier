@@ -62,9 +62,9 @@ def train(num_classes, model, optimizer, scheduler, train_dataloader, val_datalo
         writer.add_scalar('training loss', mean(running_loss), epochs)
         total_train_acc_macro = train_acc_macro.compute().cpu().data.numpy()
         total_train_acc_micro = train_acc_micro.compute().cpu().data.numpy()
-        print(f'Training accuracy macro: {total_train_acc_macro}')
+        print(f'Training accuracy macro:{total_train_acc_macro}')
         train_acc_macro_list.append(total_train_acc_macro)
-        print(f'Training accuracy micro: {total_train_acc_micro}')
+        print(f'Training accuracy micro:{total_train_acc_micro}')
         train_acc_micro_list.append(total_train_acc_micro)
 
         # Validation step 
@@ -77,9 +77,9 @@ def train(num_classes, model, optimizer, scheduler, train_dataloader, val_datalo
         
         total_val_acc_macro = val_acc_macro.compute().cpu().data.numpy()
         total_val_acc_micro = val_acc_micro.compute().cpu().data.numpy()
-        print(f'Validation accuracy macro: {total_val_acc_macro}')
+        print(f'Validation accuracy macro:{total_val_acc_macro}')
         val_acc_macro_list.append(total_val_acc_macro)
-        print(f'Validation accuracy micro: {total_val_acc_micro}')
+        print(f'Validation accuracy micro:{total_val_acc_micro}')
         val_acc_micro_list.append(total_val_acc_micro)
 
         if total_val_acc_macro > best_val_acc_macro:
@@ -90,10 +90,10 @@ def train(num_classes, model, optimizer, scheduler, train_dataloader, val_datalo
             torch.save(model.state_dict(), os.path.join(save_path))
 
     print('--------------------------------------------------')
-    print(f'Best training accuracy macro: {best_train_acc_macro}')
-    print(f'Best training accuracy micro: {best_train_acc_micro}')
-    print(f'Best validation accuracy macro: {best_val_acc_macro}')
-    print(f'Best validation accuracy micro: {best_val_acc_micro}')
+    print(f'Best training accuracy macro:{best_train_acc_macro}')
+    print(f'Best training accuracy micro:{best_train_acc_micro}')
+    print(f'Best validation accuracy macro:{best_val_acc_macro}')
+    print(f'Best validation accuracy micro:{best_val_acc_micro}')
 
     return train_acc_macro_list, train_acc_micro_list, val_acc_macro_list, val_acc_micro_list
 
@@ -130,12 +130,12 @@ def test(num_classes, model, dataloader):
         total_f1_by_class = f1_by_class.compute().cpu().data.numpy()
         print('--------------------------------------------------')
         print(f'Statistics on test set:')
-        print(f'Accuracy macro: {total_test_acc_macro}')
-        print(f'Accuracy micro: {total_test_acc_micro}')
-        print(f'F1 score macro: {total_f1_score_macro}')
-        print(f'F1 score micro: {total_f1_score_micro}')
-        print(f'Accuracy by class: {total_acc_by_class}')
-        print(f'F1 score by class: {total_f1_by_class}')
+        print(f'Accuracy macro:{total_test_acc_macro}')
+        print(f'Accuracy micro:{total_test_acc_micro}')
+        print(f'F1 score macro:{total_f1_score_macro}')
+        print(f'F1 score micro:{total_f1_score_micro}')
+        print(f'Accuracy by class:{total_acc_by_class}')
+        print(f'F1 score by class:{total_f1_by_class}')
         print('\n')
 
 if __name__ == "__main__": 
