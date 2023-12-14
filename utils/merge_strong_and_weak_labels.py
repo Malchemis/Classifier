@@ -2,6 +2,7 @@ import os
 import argparse
 import pandas as pd
 
+
 def merge_strong_and_weak(strong_labels, weak_labels, save_path): 
     """
     Merge the strong and weak labels into a single dataframe. 
@@ -23,6 +24,29 @@ def merge_strong_and_weak(strong_labels, weak_labels, save_path):
     strong_and_weak = strong_and_weak.drop(columns=['filename_extracted', 'filename_y', 'event_label'])
     # Rename the column 'filename_x' to 'filename'
     strong_and_weak = strong_and_weak.rename(columns={'filename_x': 'filename'})
+    # Rename the column 'vehicle_class' to 'event_label'
+    strong_and_weak = strong_and_weak.rename(columns={'vehicle_class': 'event_label'})
+
+    # # Convert the column 'event_label' to string
+    # strong_and_weak['event_label'] = strong_and_weak['event_label'].apply(lambda x: 'class_' + str(x))
+    
+    # # Rename class 1 to motorcycle
+    # strong_and_weak['event_label'] = strong_and_weak['event_label'].apply(lambda x: 'motorcycle' if x == 1 else x)
+    # Rename class 2 to car
+    strong_and_weak['event_label'] = strong_and_weak['event_label'].apply(lambda x: 'car' if x == 2 else x)
+    # Rename classes 5 and 12 to lorry 
+    strong_and_weak['event_label'] = strong_and_weak['event_label'].apply(lambda x: 'lorry' if x in [5, 12] else x)
+    # Remove class 15 
+    strong_and_weak = strong_and_weak[strong_and_weak['event_label'] != 15].reset_index(drop=True)
+    # Remove class 1 
+    strong_and_weak = strong_and_weak[strong_and_weak['event_label'] != 1].reset_index(drop=True)
+
+    # Keep only the audios in which the onset is between 3.5 and 7.4 seconds
+    strong_and_weak = strong_and_weak[(strong_and_weak['onset'] >= 3.5) & (strong_and_weak['onset'] <= 7.4)].reset_index(drop=True)
+    # And the offset is less than 13 seconds
+    strong_and_weak = strong_and_weak[strong_and_weak['offset'] <= 13].reset_index(drop=True)
+
+    print(f'Number of data after filtering: {len(strong_and_weak)}')
 
     # Save the merged dataframe to a csv file
     strong_and_weak.to_csv(save_path, sep='\t', index=False)
